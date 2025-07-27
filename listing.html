@@ -1,0 +1,354 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"
+    />
+
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div
+      class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden"
+      style="font-family: 'Plus Jakarta Sans', 'Noto Sans', sans-serif"
+    >
+      <div class="layout-container flex h-full grow flex-col">
+        <header
+          class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f1f3f4] px-10 py-3"
+        >
+          <div class="flex items-center gap-8">
+            <div class="flex items-center gap-4 text-[#121516]">
+              <div class="size-4">
+                <svg
+                  viewBox="0 0 48 48"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+              </div>
+              <h2
+                class="text-[#121516] text-lg font-bold leading-tight tracking-[-0.015em]"
+              >
+                GharBazaar
+              </h2>
+            </div>
+            <div class="flex items-center gap-9">
+              <a
+                class="text-[#121516] text-sm font-medium leading-normal"
+                href="#"
+                >Rent</a
+              >
+              <a
+                class="text-[#121516] text-sm font-medium leading-normal"
+                href="#"
+                >Buy</a
+              >
+              <a
+                class="text-[#121516] text-sm font-medium leading-normal"
+                href="#"
+                >Sell</a
+              >
+              <a
+                class="text-[#121516] text-sm font-medium leading-normal"
+                href="#"
+                >Mortgage</a
+              >
+              <a
+                class="text-[#121516] text-sm font-medium leading-normal"
+                href="#"
+                >Property Management</a
+              >
+            </div>
+          </div>
+          <div class="flex flex-1 justify-end gap-8">
+            <label class="flex flex-col min-w-40 !h-10 max-w-64">
+              <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                <div
+                  class="text-[#6a7881] flex border-none bg-[#f1f3f4] items-center justify-center pl-4 rounded-l-xl border-r-0"
+                  data-icon="MagnifyingGlass"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+                    ></path>
+                  </svg>
+                </div>
+                <input
+                  placeholder="Search"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#121516] focus:outline-0 focus:ring-0 border-none bg-[#f1f3f4] focus:border-none h-full placeholder:text-[#6a7881] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                  value=""
+                />
+              </div>
+            </label>
+            <button
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-[#b2d1e5] text-[#121516] text-sm font-bold leading-normal tracking-[0.015em]"
+            >
+              <span class="truncate">Post Property</span>
+            </button>
+            <div
+              class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+              style="
+                background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDjeukCdj7ASKbLicmc-Yqt1kCNwVXg0qpxNi5TaEAYr01wvjaFfmkOiVUKadPnrLNt6GjM_aig2J7emJptB-Wxs-4kLc-Qr9SIbKtg-lAu4rcYwBhetVhSTzNIPhfGFffmybkR2uxEPFQ5rxuOaQD6yH2i6UGmu75H7s6g5tKoDvakBYeHvlcMIn__3HzpB0_mOTxIpUJ4NuHpFvjrjG2VwRX0Sm4OcTjDujSZPicssXCtTIeuhE0wznRvddKQdZdMH_Gr7DIxjhA1');
+              "
+            ></div>
+          </div>
+        </header>
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div
+            class="layout-content-container flex flex-col max-w-[960px] flex-1"
+          >
+            <div class="@container">
+              <div class="@[480px]:px-4 @[480px]:py-3">
+                <div
+                  class="bg-cover bg-center flex flex-col justify-end overflow-hidden bg-white @[480px]:rounded-xl min-h-80"
+                  style="
+                    background-image: linear-gradient(
+                        0deg,
+                        rgba(0, 0, 0, 0.4) 0%,
+                        rgba(0, 0, 0, 0) 25%
+                      ),
+                      url('https://lh3.googleusercontent.com/aida-public/AB6AXuCu-P1SLnFQbf33dSWuTgSC4ZlJKaqeWqylby97omwzqEHzQhX4e88NNbsg946ekyan-YeHavBWws7Zu14kih7DDZqyEKqlxEQS23Mp-PAGi4nbNhRLmDxlZAHQcIoF-p-w59tbHPACngCc2vxAreURv8KUCcEcs1XR4CLTFZBEUTEh8HYW2_qhh_vrJ_jXSv2Tveaa5eENN-8qMSRDwkArdlX6loV8MC6jfHxkG1gEZvnJwQm4Riswmx_XIraRD5cF4bH2_QRgjtd7');
+                  "
+                >
+                  <div class="flex justify-center gap-2 p-5">
+                    <div class="size-1.5 rounded-full bg-white"></div>
+                    <div
+                      class="size-1.5 rounded-full bg-white opacity-50"
+                    ></div>
+                    <div
+                      class="size-1.5 rounded-full bg-white opacity-50"
+                    ></div>
+                    <div
+                      class="size-1.5 rounded-full bg-white opacity-50"
+                    ></div>
+                    <div
+                      class="size-1.5 rounded-full bg-white opacity-50"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-wrap justify-between gap-3 p-4">
+              <div class="flex min-w-72 flex-col gap-3">
+                <p
+                  class="text-[#121516] tracking-light text-[32px] font-bold leading-tight"
+                >
+                  Cozy Apartment in Lakeside
+                </p>
+                <p class="text-[#6a7881] text-sm font-normal leading-normal">
+                  Rs. 15,000 / month · Lakeside, Pokhara
+                </p>
+              </div>
+            </div>
+            <p
+              class="text-[#121516] text-base font-normal leading-normal pb-3 pt-1 px-4"
+            >
+              This charming apartment in Lakeside offers a comfortable living
+              space with modern amenities. It features a spacious living room, a
+              fully equipped kitchen, and a cozy bedroom. The apartment is
+              located in a quiet neighborhood, close to local shops and
+              restaurants, and offers stunning views of the lake and mountains.
+            </p>
+            <h2
+              class="text-[#121516] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"
+            >
+              Amenities
+            </h2>
+            <div
+              class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4"
+            >
+              <div
+                class="flex flex-1 gap-3 rounded-lg border border-[#dde1e3] bg-white p-4 items-center"
+              >
+                <div
+                  class="text-[#121516]"
+                  data-icon="WifiHigh"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M140,204a12,12,0,1,1-12-12A12,12,0,0,1,140,204ZM237.08,87A172,172,0,0,0,18.92,87,8,8,0,0,0,29.08,99.37a156,156,0,0,1,197.84,0A8,8,0,0,0,237.08,87ZM205,122.77a124,124,0,0,0-153.94,0A8,8,0,0,0,61,135.31a108,108,0,0,1,134.06,0,8,8,0,0,0,11.24-1.3A8,8,0,0,0,205,122.77Zm-32.26,35.76a76.05,76.05,0,0,0-89.42,0,8,8,0,0,0,9.42,12.94,60,60,0,0,1,70.58,0,8,8,0,1,0,9.42-12.94Z"
+                    ></path>
+                  </svg>
+                </div>
+                <h2 class="text-[#121516] text-base font-bold leading-tight">
+                  Wi-Fi
+                </h2>
+              </div>
+              <div
+                class="flex flex-1 gap-3 rounded-lg border border-[#dde1e3] bg-white p-4 items-center"
+              >
+                <div
+                  class="text-[#121516]"
+                  data-icon="Bathtub"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M232,96H208a8,8,0,0,0-8-8H136a8,8,0,0,0-8,8H64V52A12,12,0,0,1,76,40a12.44,12.44,0,0,1,12.16,9.59,8,8,0,0,0,15.68-3.18A28.32,28.32,0,0,0,76,24,28,28,0,0,0,48,52V96H24A16,16,0,0,0,8,112v32a56.06,56.06,0,0,0,56,56v16a8,8,0,0,0,16,0V200h96v16a8,8,0,0,0,16,0V200a56.06,56.06,0,0,0,56-56V112A16,16,0,0,0,232,96Zm-40,8v32H144V104Zm40,40a40,40,0,0,1-40,40H64a40,40,0,0,1-40-40V112H128v32a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V112h24Z"
+                    ></path>
+                  </svg>
+                </div>
+                <h2 class="text-[#121516] text-base font-bold leading-tight">
+                  2 Bathrooms
+                </h2>
+              </div>
+              <div
+                class="flex flex-1 gap-3 rounded-lg border border-[#dde1e3] bg-white p-4 items-center"
+              >
+                <div
+                  class="text-[#121516]"
+                  data-icon="Bed"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M208,72H24V48A8,8,0,0,0,8,48V208a8,8,0,0,0,16,0V176H232v32a8,8,0,0,0,16,0V112A40,40,0,0,0,208,72ZM24,88H96v72H24Zm88,72V88h96a24,24,0,0,1,24,24v48Z"
+                    ></path>
+                  </svg>
+                </div>
+                <h2 class="text-[#121516] text-base font-bold leading-tight">
+                  2 Bedrooms
+                </h2>
+              </div>
+              <div
+                class="flex flex-1 gap-3 rounded-lg border border-[#dde1e3] bg-white p-4 items-center"
+              >
+                <div
+                  class="text-[#121516]"
+                  data-icon="Car"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M240,112H229.2L201.42,49.5A16,16,0,0,0,186.8,40H69.2a16,16,0,0,0-14.62,9.5L26.8,112H16a8,8,0,0,0,0,16h8v80a16,16,0,0,0,16,16H64a16,16,0,0,0,16-16V192h96v16a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16V128h8a8,8,0,0,0,0-16ZM69.2,56H186.8l24.89,56H44.31ZM64,208H40V192H64Zm128,0V192h24v16Zm24-32H40V128H216ZM56,152a8,8,0,0,1,8-8H80a8,8,0,0,1,0,16H64A8,8,0,0,1,56,152Zm112,0a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H176A8,8,0,0,1,168,152Z"
+                    ></path>
+                  </svg>
+                </div>
+                <h2 class="text-[#121516] text-base font-bold leading-tight">
+                  Parking
+                </h2>
+              </div>
+              <div
+                class="flex flex-1 gap-3 rounded-lg border border-[#dde1e3] bg-white p-4 items-center"
+              >
+                <div
+                  class="text-[#121516]"
+                  data-icon="Television"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M216,64H147.31l34.35-34.34a8,8,0,1,0-11.32-11.32L128,60.69,85.66,18.34A8,8,0,0,0,74.34,29.66L108.69,64H40A16,16,0,0,0,24,80V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64ZM40,80H144V200H40ZM216,200H160V80h56V200Zm-16-84a12,12,0,1,1-12-12A12,12,0,0,1,200,116Zm0,48a12,12,0,1,1-12-12A12,12,0,0,1,200,164Z"
+                    ></path>
+                  </svg>
+                </div>
+                <h2 class="text-[#121516] text-base font-bold leading-tight">
+                  TV
+                </h2>
+              </div>
+              <div
+                class="flex flex-1 gap-3 rounded-lg border border-[#dde1e3] bg-white p-4 items-center"
+              >
+                <div
+                  class="text-[#121516]"
+                  data-icon="CookingPot"
+                  data-size="24px"
+                  data-weight="regular"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M88,48V16a8,8,0,0,1,16,0V48a8,8,0,0,1-16,0Zm40,8a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V48A8,8,0,0,0,128,56Zm32,0a8,8,0,0,0,8-8V16a8,8,0,0,0-16,0V48A8,8,0,0,0,160,56Zm92.8,46.4L224,124v60a32,32,0,0,1-32,32H64a32,32,0,0,1-32-32V124L3.2,102.4a8,8,0,0,1,9.6-12.8L32,104V88A16,16,0,0,1,48,72H208a16,16,0,0,1,16,16v16l19.2-14.4a8,8,0,0,1,9.6,12.8ZM208,88H48v96a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16Z"
+                    ></path>
+                  </svg>
+                </div>
+                <h2 class="text-[#121516] text-base font-bold leading-tight">
+                  Kitchen
+                </h2>
+              </div>
+            </div>
+            <h2
+              class="text-[#121516] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"
+            >
+              Location
+            </h2>
+            <div class="flex px-4 py-3">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl object-cover"
+                style="
+                  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDOueI-vx5ycnnucU-XHPUmwbAsXLQqfr7gXm-wBGcCit912UNlMYsFvSy_eZRK9h7NM-0K15NkSS1zDRnyOdPxzUUT7bKt7xGUYwg90-ZN0T-xm62HT_Bv-dckco3iqsoxVID73AzTCL4BAlkuhyDyDqRybwqeYKzlbjoj2h1TXnDisCRK9vsgeq125ai_lCEK8OtGiNEinAaxwDr5Bpl9HLUux6jUr_eToO2cpLxub4eIntIWlDMcQB0TGgqdx9liRAQAR_HKThVS');
+                "
+              ></div>
+            </div>
+            <div class="flex px-4 py-3 justify-end">
+              <button
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 bg-[#b2d1e5] text-[#121516] text-base font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Contact Landlord</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
