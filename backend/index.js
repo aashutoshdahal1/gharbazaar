@@ -4,13 +4,15 @@ const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
 const { pool, testConnection } = require("./config/db");
+const authRoutes = require("./routes/auth");
+
 const PORT = process.env.PORT || 5001;
+
 app.use(express.json());
 app.use(cors());
 
-app.get("/try", (req, res) => {
-  res.send({ msg: "Hello from GharBazaar Backend!" });
-});
+// Routes
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, async () => {
   console.log(`server started at port ${PORT}`);
