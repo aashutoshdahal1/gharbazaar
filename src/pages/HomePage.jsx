@@ -1,7 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function GharBazaarHomepage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  // Check for user authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+    
+    if (token && userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+    }
+  }, []);
+
+  const handleAuthClick = () => {
+    navigate("/login");
+  };
+
+  const handleProfileClick = () => {
+    navigate("/dashboard");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setIsLoggedIn(false);
+  };
 
   const featuredListings = [
     {
@@ -66,21 +103,42 @@ export default function GharBazaarHomepage() {
       alignItems: "center",
       gap: "1rem",
     },
-    signupBtn: {
+    authBtn: {
       backgroundColor: "#3b82f6",
       color: "white",
       padding: "0.5rem 1rem",
       borderRadius: "0.5rem",
       border: "none",
       cursor: "pointer",
+      fontSize: "0.875rem",
+      fontWeight: "500",
     },
-    loginBtn: {
-      color: "#6b7280",
+    profileContainer: {
+      display: "flex",
+      alignItems: "center",
+      gap: "0.75rem",
+      cursor: "pointer",
       padding: "0.5rem 1rem",
       borderRadius: "0.5rem",
-      border: "1px solid #d1d5db",
-      backgroundColor: "white",
+      transition: "background-color 0.2s",
+    },
+    profileName: {
+      color: "#111827",
+      fontSize: "0.875rem",
+      fontWeight: "500",
+    },
+    profileAvatar: {
+      fontSize: "1.25rem",
+    },
+    logoutBtn: {
+      backgroundColor: "#ef4444",
+      color: "white",
+      padding: "0.5rem 1rem",
+      borderRadius: "0.5rem",
+      border: "none",
       cursor: "pointer",
+      fontSize: "0.875rem",
+      fontWeight: "500",
     },
     hero: {
       background: "linear-gradient(to right, #2563eb, #1e40af)",
@@ -276,9 +334,26 @@ export default function GharBazaarHomepage() {
 
           {/* Auth Buttons */}
           <div style={styles.authButtons}>
-            <button style={styles.signupBtn}>Sign up</button>
-            <button style={styles.loginBtn}>Login</button>
-            <div style={{ fontSize: "1.25rem", cursor: "pointer" }}>👤</div>
+            {isLoggedIn ? (
+              <>
+                <div 
+                  style={styles.profileContainer}
+                  onClick={handleProfileClick}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = "#f3f4f6"}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                >
+                  <span style={styles.profileName}>Hi, {user?.name}</span>
+                  <div style={styles.profileAvatar}>👤</div>
+                </div>
+                <button style={styles.logoutBtn} onClick={handleLogout}>
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button style={styles.authBtn} onClick={handleAuthClick}>
+                Login / Sign Up
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -412,7 +487,7 @@ export default function GharBazaarHomepage() {
             </ul>
           </div>
         </div>
-        <div style={styles.fooguterBottom}>
+        <div style={styles.footerBottom}>
           <p>&copy; 2025 GharBazaar. All rights reserved.</p>
         </div>
       </footer>
