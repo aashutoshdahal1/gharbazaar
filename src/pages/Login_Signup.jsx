@@ -83,6 +83,10 @@ const GharBazaarAuth = () => {
     }
   };
 
+  const handleLogoClick = () => {
+    navigate("/");
+  };
+
   const styles = {
     body: {
       fontFamily: "'Plus Jakarta Sans', 'Noto Sans', sans-serif",
@@ -122,6 +126,8 @@ const GharBazaarAuth = () => {
     logo: {
       width: "16px",
       height: "16px",
+      cursor: "pointer",
+      transition: "transform 0.2s ease",
     },
     title: {
       color: "#121516",
@@ -129,6 +135,7 @@ const GharBazaarAuth = () => {
       fontWeight: "bold",
       lineHeight: "1.25",
       letterSpacing: "-0.015em",
+      transition: "transform 0.2s ease",
     },
     navLinks: {
       display: "flex",
@@ -300,7 +307,12 @@ const GharBazaarAuth = () => {
       <div style={styles.layoutContainer}>
         <header style={styles.header}>
           <div style={styles.logoContainer}>
-            <div style={styles.logo}>
+            <div
+              style={styles.logo}
+              onClick={handleLogoClick}
+              onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
+              onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+            >
               <svg
                 viewBox="0 0 48 48"
                 fill="none"
@@ -312,7 +324,14 @@ const GharBazaarAuth = () => {
                 ></path>
               </svg>
             </div>
-            <h2 style={styles.title}>GharBazaar</h2>
+            <h2
+              style={{ ...styles.title, cursor: "pointer" }}
+              onClick={handleLogoClick}
+              onMouseEnter={(e) => (e.target.style.transform = "scale(1.02)")}
+              onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+            >
+              GharBazaar
+            </h2>
           </div>
           <div style={styles.navLinks}>
             <div style={styles.navLinkContainer}>

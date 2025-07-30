@@ -11,7 +11,7 @@ export default function GharBazaarHomepage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
-    
+
     if (token && userData) {
       try {
         const parsedUser = JSON.parse(userData);
@@ -38,6 +38,10 @@ export default function GharBazaarHomepage() {
     localStorage.removeItem("user");
     setUser(null);
     setIsLoggedIn(false);
+  };
+
+  const handleLogoClick = () => {
+    navigate("/");
   };
 
   const featuredListings = [
@@ -80,22 +84,57 @@ export default function GharBazaarHomepage() {
     },
     header: {
       backgroundColor: "white",
-      boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
       borderBottom: "1px solid #e5e7eb",
+      position: "sticky",
+      top: 0,
+      zIndex: 1000,
     },
     headerContent: {
       maxWidth: "1280px",
       margin: "0 auto",
-      padding: "0 1rem",
+      padding: "0 2rem",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      height: "4rem",
+      height: "4.5rem",
     },
     logo: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-      color: "#111827",
+      display: "flex",
+      alignItems: "center",
+      gap: "0.75rem",
+      fontSize: "1.75rem",
+      fontWeight: "700",
+      color: "#1e40af",
+      cursor: "pointer",
+      textDecoration: "none",
+      transition: "transform 0.2s ease",
+    },
+    logoIcon: {
+      fontSize: "1.75rem",
+    },
+    navSection: {
+      display: "flex",
+      alignItems: "center",
+      gap: "2rem",
+    },
+    navLinks: {
+      display: "flex",
+      alignItems: "center",
+      gap: "2rem",
+      margin: 0,
+      padding: 0,
+      listStyle: "none",
+    },
+    navLink: {
+      color: "#4b5563",
+      fontSize: "0.95rem",
+      fontWeight: "500",
+      textDecoration: "none",
+      padding: "0.5rem 1rem",
+      borderRadius: "0.5rem",
+      transition: "all 0.2s ease",
+      cursor: "pointer",
     },
 
     authButtons: {
@@ -104,14 +143,16 @@ export default function GharBazaarHomepage() {
       gap: "1rem",
     },
     authBtn: {
-      backgroundColor: "#3b82f6",
+      backgroundColor: "#1e40af",
       color: "white",
-      padding: "0.5rem 1rem",
+      padding: "0.75rem 1.5rem",
       borderRadius: "0.5rem",
       border: "none",
       cursor: "pointer",
-      fontSize: "0.875rem",
-      fontWeight: "500",
+      fontSize: "0.9rem",
+      fontWeight: "600",
+      transition: "all 0.2s ease",
+      boxShadow: "0 2px 4px rgba(30, 64, 175, 0.2)",
     },
     profileContainer: {
       display: "flex",
@@ -120,25 +161,69 @@ export default function GharBazaarHomepage() {
       cursor: "pointer",
       padding: "0.5rem 1rem",
       borderRadius: "0.5rem",
-      transition: "background-color 0.2s",
+      transition: "background-color 0.2s ease",
+      border: "1px solid #e5e7eb",
+      backgroundColor: "#f9fafb",
     },
     profileName: {
-      color: "#111827",
-      fontSize: "0.875rem",
-      fontWeight: "500",
+      color: "#1f2937",
+      fontSize: "0.9rem",
+      fontWeight: "600",
     },
     profileAvatar: {
-      fontSize: "1.25rem",
+      width: "2rem",
+      height: "2rem",
+      borderRadius: "50%",
+      backgroundColor: "#1e40af",
+      color: "white",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "0.9rem",
+      fontWeight: "600",
+    },
+    profileDropdownIcon: {
+      fontSize: "0.8rem",
+      color: "#6b7280",
+      marginLeft: "0.25rem",
     },
     logoutBtn: {
-      backgroundColor: "#ef4444",
-      color: "white",
+      backgroundColor: "transparent",
+      color: "#ef4444",
       padding: "0.5rem 1rem",
       borderRadius: "0.5rem",
+      border: "1px solid #ef4444",
+      cursor: "pointer",
+      fontSize: "0.85rem",
+      fontWeight: "500",
+      transition: "all 0.2s ease",
+    },
+    mobileMenuBtn: {
+      display: "none",
+      backgroundColor: "transparent",
       border: "none",
       cursor: "pointer",
-      fontSize: "0.875rem",
-      fontWeight: "500",
+      padding: "0.5rem",
+      borderRadius: "0.25rem",
+      color: "#6b7280",
+    },
+    // Responsive styles for mobile
+    "@media (max-width: 768px)": {
+      navSection: {
+        display: "none",
+      },
+      mobileMenuBtn: {
+        display: "block",
+      },
+      headerContent: {
+        padding: "0 1rem",
+      },
+      authButtons: {
+        gap: "0.5rem",
+      },
+      profileName: {
+        display: "none",
+      },
     },
     hero: {
       background: "linear-gradient(to right, #2563eb, #1e40af)",
@@ -330,27 +415,152 @@ export default function GharBazaarHomepage() {
       <header style={styles.header}>
         <div style={styles.headerContent}>
           {/* Logo */}
-          <div style={styles.logo}>🏠 GharBazaar</div>
+          <div
+            style={styles.logo}
+            onClick={handleLogoClick}
+            onMouseEnter={(e) => (e.target.style.transform = "scale(1.02)")}
+            onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+          >
+            <span style={styles.logoIcon}>🏠</span>
+            <span>GharBazaar</span>
+          </div>
 
-          {/* Auth Buttons */}
+          {/* Navigation Links */}
+          <nav style={styles.navSection}>
+            <ul style={styles.navLinks}>
+              <li>
+                <span
+                  style={styles.navLink}
+                  onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
+                  onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                >
+                  Home
+                </span>
+              </li>
+              <li>
+                <span
+                  style={styles.navLink}
+                  onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
+                  onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                >
+                  Properties
+                </span>
+              </li>
+              <li>
+                <span
+                  style={styles.navLink}
+                  onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
+                  onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                >
+                  About
+                </span>
+              </li>
+              <li>
+                <span
+                  style={styles.navLink}
+                  onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
+                  onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                >
+                  Contact
+                </span>
+              </li>
+            </ul>
+          </nav>
+
+          {/* Mobile Menu Button */}
+          <button style={styles.mobileMenuBtn}>
+            <svg
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+
+          {/* Auth Section */}
           <div style={styles.authButtons}>
             {isLoggedIn ? (
               <>
-                <div 
+                <div
                   style={styles.profileContainer}
                   onClick={handleProfileClick}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = "#f3f4f6"}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = "transparent"}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#e5e7eb";
+                    e.target.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.15)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "#f9fafb";
+                    e.target.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+                  }}
+                  title="Go to Dashboard"
                 >
-                  <span style={styles.profileName}>Hi, {user?.name}</span>
-                  <div style={styles.profileAvatar}>👤</div>
+                  <div style={styles.profileAvatar}>
+                    {user?.name?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <span style={styles.profileName}>Hi, {user?.name}</span>
+                    <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                      View Dashboard
+                    </span>
+                  </div>
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="#6b7280"
+                    viewBox="0 0 24 24"
+                    style={styles.profileDropdownIcon}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
                 </div>
-                <button style={styles.logoutBtn} onClick={handleLogout}>
+                <button
+                  style={styles.logoutBtn}
+                  onClick={handleLogout}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#ef4444";
+                    e.target.style.color = "white";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "transparent";
+                    e.target.style.color = "#ef4444";
+                  }}
+                >
                   Logout
                 </button>
               </>
             ) : (
-              <button style={styles.authBtn} onClick={handleAuthClick}>
+              <button
+                style={styles.authBtn}
+                onClick={handleAuthClick}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#1d4ed8";
+                  e.target.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#1e40af";
+                  e.target.style.transform = "translateY(0)";
+                }}
+              >
                 Login / Sign Up
               </button>
             )}
