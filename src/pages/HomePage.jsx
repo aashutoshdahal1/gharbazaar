@@ -5,6 +5,15 @@ export default function GharBazaarHomepage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false
+  );
+  const [isTablet, setIsTablet] = useState(
+    typeof window !== "undefined"
+      ? window.innerWidth <= 992 && window.innerWidth > 768
+      : false
+  );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Check for user authentication on component mount
@@ -25,6 +34,34 @@ export default function GharBazaarHomepage() {
     }
   }, []);
 
+  // Handle responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      setIsTablet(window.innerWidth <= 992 && window.innerWidth > 768);
+      // Close mobile menu when screen gets larger
+      if (window.innerWidth > 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Handle responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      setIsTablet(window.innerWidth <= 992 && window.innerWidth > 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleAuthClick = () => {
     navigate("/login");
   };
@@ -42,6 +79,10 @@ export default function GharBazaarHomepage() {
 
   const handleLogoClick = () => {
     navigate("/");
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const featuredListings = [
@@ -93,17 +134,17 @@ export default function GharBazaarHomepage() {
     headerContent: {
       maxWidth: "1280px",
       margin: "0 auto",
-      padding: "0 2rem",
+      padding: isMobile ? "0 0.75rem" : "0 2rem",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      height: "4.5rem",
+      height: isMobile ? "3.5rem" : "4.5rem",
     },
     logo: {
       display: "flex",
       alignItems: "center",
-      gap: "0.75rem",
-      fontSize: "1.75rem",
+      gap: isMobile ? "0.5rem" : "0.75rem",
+      fontSize: isMobile ? "1.25rem" : "1.75rem",
       fontWeight: "700",
       color: "#1e40af",
       cursor: "pointer",
@@ -111,17 +152,17 @@ export default function GharBazaarHomepage() {
       transition: "transform 0.2s ease",
     },
     logoIcon: {
-      fontSize: "1.75rem",
+      fontSize: isMobile ? "1.25rem" : "1.75rem",
     },
     navSection: {
-      display: "flex",
+      display: isMobile ? "none" : "flex",
       alignItems: "center",
       gap: "2rem",
     },
     navLinks: {
       display: "flex",
       alignItems: "center",
-      gap: "2rem",
+      gap: isTablet ? "1.5rem" : "2rem",
       margin: 0,
       padding: 0,
       listStyle: "none",
@@ -138,18 +179,18 @@ export default function GharBazaarHomepage() {
     },
 
     authButtons: {
-      display: "flex",
+      display: isMobile ? "none" : "flex",
       alignItems: "center",
-      gap: "1rem",
+      gap: isMobile ? "0.5rem" : "1rem",
     },
     authBtn: {
       backgroundColor: "#1e40af",
       color: "white",
-      padding: "0.75rem 1.5rem",
+      padding: isMobile ? "0.5rem 0.75rem" : "0.75rem 1.5rem",
       borderRadius: "0.5rem",
       border: "none",
       cursor: "pointer",
-      fontSize: "0.9rem",
+      fontSize: isMobile ? "0.8rem" : "0.9rem",
       fontWeight: "600",
       transition: "all 0.2s ease",
       boxShadow: "0 2px 4px rgba(30, 64, 175, 0.2)",
@@ -157,9 +198,9 @@ export default function GharBazaarHomepage() {
     profileContainer: {
       display: "flex",
       alignItems: "center",
-      gap: "0.75rem",
+      gap: isMobile ? "0.5rem" : "0.75rem",
       cursor: "pointer",
-      padding: "0.5rem 1rem",
+      padding: isMobile ? "0.5rem" : "0.5rem 1rem",
       borderRadius: "0.5rem",
       transition: "background-color 0.2s ease",
       border: "1px solid #e5e7eb",
@@ -167,19 +208,19 @@ export default function GharBazaarHomepage() {
     },
     profileName: {
       color: "#1f2937",
-      fontSize: "0.9rem",
+      fontSize: isMobile ? "0.85rem" : "0.9rem",
       fontWeight: "600",
     },
     profileAvatar: {
-      width: "2rem",
-      height: "2rem",
+      width: isMobile ? "1.75rem" : "2rem",
+      height: isMobile ? "1.75rem" : "2rem",
       borderRadius: "50%",
       backgroundColor: "#1e40af",
       color: "white",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      fontSize: "0.9rem",
+      fontSize: isMobile ? "0.8rem" : "0.9rem",
       fontWeight: "600",
     },
     profileDropdownIcon: {
@@ -199,7 +240,7 @@ export default function GharBazaarHomepage() {
       transition: "all 0.2s ease",
     },
     mobileMenuBtn: {
-      display: "none",
+      display: isMobile ? "block" : "none",
       backgroundColor: "transparent",
       border: "none",
       cursor: "pointer",
@@ -207,51 +248,73 @@ export default function GharBazaarHomepage() {
       borderRadius: "0.25rem",
       color: "#6b7280",
     },
-    // Responsive styles for mobile
-    "@media (max-width: 768px)": {
-      navSection: {
-        display: "none",
-      },
-      mobileMenuBtn: {
-        display: "block",
-      },
-      headerContent: {
-        padding: "0 1rem",
-      },
-      authButtons: {
-        gap: "0.5rem",
-      },
-      profileName: {
-        display: "none",
-      },
+    mobileMenu: {
+      display: isMobile && isMobileMenuOpen ? "block" : "none",
+      position: "absolute",
+      top: "100%",
+      left: 0,
+      right: 0,
+      backgroundColor: "white",
+      borderBottom: "1px solid #e5e7eb",
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+      zIndex: 999,
+    },
+    mobileMenuContent: {
+      padding: "1rem",
+      maxWidth: "1280px",
+      margin: "0 auto",
+    },
+    mobileNavLinks: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.75rem",
+      marginBottom: "1rem",
+    },
+    mobileNavLink: {
+      color: "#4b5563",
+      fontSize: "1rem",
+      fontWeight: "500",
+      textDecoration: "none",
+      padding: "0.75rem 1rem",
+      borderRadius: "0.5rem",
+      transition: "all 0.2s ease",
+      cursor: "pointer",
+      backgroundColor: "#f9fafb",
+      textAlign: "center",
+    },
+    mobileAuthSection: {
+      borderTop: "1px solid #e5e7eb",
+      paddingTop: "1rem",
     },
     hero: {
       background: "linear-gradient(to right, #2563eb, #1e40af)",
       color: "white",
-      padding: "5rem 0",
+      padding: isMobile ? "2rem 0" : "5rem 0",
       textAlign: "center",
     },
     heroContent: {
       maxWidth: "1280px",
       margin: "0 auto",
-      padding: "0 1rem",
+      padding: isMobile ? "0 1rem" : "0 1rem",
     },
     heroTitle: {
-      fontSize: "3rem",
+      fontSize: isMobile ? "1.875rem" : "3rem",
       fontWeight: "bold",
-      marginBottom: "1.5rem",
+      marginBottom: isMobile ? "0.75rem" : "1.5rem",
     },
     heroSubtitle: {
-      fontSize: "1.25rem",
-      marginBottom: "2rem",
+      fontSize: isMobile ? "1rem" : "1.25rem",
+      marginBottom: isMobile ? "1rem" : "2rem",
       color: "#dbeafe",
     },
     searchContainer: {
-      maxWidth: "28rem",
+      maxWidth: isMobile ? "100%" : "28rem",
       margin: "0 auto",
+      padding: isMobile ? "0 1rem" : "0",
     },
     searchBox: {
       display: "flex",
+      flexDirection: isMobile ? "column" : "row",
       backgroundColor: "white",
       borderRadius: "0.5rem",
       overflow: "hidden",
@@ -259,18 +322,23 @@ export default function GharBazaarHomepage() {
     },
     searchInput: {
       flex: 1,
-      padding: "1rem 1.5rem",
+      padding: isMobile ? "0.75rem 1rem" : "1rem 1.5rem",
       border: "none",
       outline: "none",
-      fontSize: "1rem",
+      fontSize: isMobile ? "0.875rem" : "1rem",
     },
     searchBtn: {
       backgroundColor: "#3b82f6",
       color: "white",
-      padding: "1rem 1.5rem",
+      padding: isMobile ? "0.75rem 1rem" : "1rem 1.5rem",
       border: "none",
       fontWeight: "600",
       cursor: "pointer",
+      ...(isMobile && {
+        marginTop: "0.5rem",
+        borderRadius: "0.25rem",
+        margin: "0.5rem",
+      }),
     },
     filterTabs: {
       backgroundColor: "white",
@@ -279,50 +347,58 @@ export default function GharBazaarHomepage() {
     filterTabsContent: {
       maxWidth: "1280px",
       margin: "0 auto",
-      padding: "0 1rem",
-      display: "flex",
-      gap: "2rem",
+      paddingLeft: isMobile ? "1rem" : "1rem",
+      paddingRight: isMobile ? "1rem" : "1rem",
       paddingTop: "1rem",
       paddingBottom: "1rem",
+      display: "flex",
+      gap: isMobile ? "0.75rem" : "2rem",
+      overflowX: isMobile ? "auto" : "visible",
+      scrollbarWidth: isMobile ? "none" : "auto",
+      msOverflowStyle: isMobile ? "none" : "auto",
     },
     filterTab: {
-      padding: "0.5rem 1rem",
+      padding: isMobile ? "0.5rem" : "0.5rem 1rem",
       color: "#6b7280",
       border: "none",
       backgroundColor: "transparent",
       cursor: "pointer",
       borderBottom: "2px solid transparent",
+      whiteSpace: "nowrap",
+      fontSize: isMobile ? "0.85rem" : "1rem",
     },
     featuredSection: {
-      padding: "3rem 0",
+      padding: isMobile ? "1.5rem 0" : "3rem 0",
     },
     featuredContent: {
       maxWidth: "1280px",
       margin: "0 auto",
-      padding: "0 1rem",
+      padding: isMobile ? "0 1rem" : "0 1rem",
     },
     featuredTitle: {
-      fontSize: "1.875rem",
+      fontSize: isMobile ? "1.25rem" : "1.875rem",
       fontWeight: "bold",
       color: "#111827",
-      marginBottom: "2rem",
+      marginBottom: isMobile ? "1rem" : "2rem",
     },
     grid: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-      gap: "1.5rem",
-      marginBottom: "2rem",
+      gridTemplateColumns: isMobile
+        ? "1fr"
+        : "repeat(auto-fit, minmax(280px, 1fr))",
+      gap: isMobile ? "1rem" : "1.5rem",
+      marginBottom: isMobile ? "1rem" : "2rem",
     },
     card: {
       backgroundColor: "white",
-      borderRadius: "0.5rem",
+      borderRadius: isMobile ? "0.375rem" : "0.5rem",
       boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
       overflow: "hidden",
       cursor: "pointer",
       transition: "box-shadow 0.3s",
     },
     cardImage: {
-      height: "12rem",
+      height: isMobile ? "8rem" : "12rem",
       backgroundColor: "#e5e7eb",
       display: "flex",
       alignItems: "center",
@@ -330,7 +406,7 @@ export default function GharBazaarHomepage() {
       color: "#6b7280",
     },
     cardContent: {
-      padding: "1rem",
+      padding: isMobile ? "0.75rem" : "1rem",
     },
     cardType: {
       backgroundColor: "#dbeafe",
@@ -360,32 +436,46 @@ export default function GharBazaarHomepage() {
       cursor: "pointer",
     },
     footer: {
-      backgroundColor: "#1f2937",
+      background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
       color: "white",
-      padding: "2rem 0",
+      padding: isMobile ? "2rem 0" : "3rem 0 2rem 0",
+      position: "relative",
+      overflow: "hidden",
     },
     footerContent: {
       maxWidth: "1280px",
       margin: "0 auto",
-      padding: "0 1rem",
+      padding: isMobile ? "0 1rem" : "0 2rem",
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-      gap: "2rem",
+      gridTemplateColumns: isMobile
+        ? "1fr"
+        : "repeat(auto-fit, minmax(250px, 1fr))",
+      gap: isMobile ? "2rem" : "3rem",
+      position: "relative",
+      zIndex: 2,
     },
     footerSection: {
-      marginBottom: "1rem",
+      marginBottom: isMobile ? "1rem" : "0",
     },
     footerTitle: {
-      fontSize: "1.25rem",
+      fontSize: isMobile ? "1.5rem" : "1.75rem",
       fontWeight: "bold",
       marginBottom: "1rem",
+      background: "linear-gradient(45deg, #3b82f6, #1e40af)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
     },
     footerSubtitle: {
       fontWeight: "600",
       marginBottom: "1rem",
+      fontSize: "1.1rem",
+      color: "#e5e7eb",
     },
     footerText: {
       color: "#9ca3af",
+      lineHeight: "1.6",
+      fontSize: "0.95rem",
     },
     footerList: {
       listStyle: "none",
@@ -393,19 +483,60 @@ export default function GharBazaarHomepage() {
       margin: 0,
     },
     footerListItem: {
-      marginBottom: "0.5rem",
+      marginBottom: "0.75rem",
     },
     footerLink: {
       color: "#9ca3af",
       textDecoration: "none",
       cursor: "pointer",
+      transition: "all 0.3s ease",
+      fontSize: "0.95rem",
+      position: "relative",
+      display: "inline-block",
+    },
+    footerSocialSection: {
+      textAlign: isMobile ? "center" : "left",
+    },
+    socialLinks: {
+      display: "flex",
+      gap: "1rem",
+      justifyContent: isMobile ? "center" : "flex-start",
+      marginTop: "1rem",
+    },
+    socialLink: {
+      width: "2.5rem",
+      height: "2.5rem",
+      borderRadius: "50%",
+      backgroundColor: "rgba(59, 130, 246, 0.1)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#3b82f6",
+      textDecoration: "none",
+      transition: "all 0.3s ease",
+      cursor: "pointer",
     },
     footerBottom: {
-      borderTop: "1px solid #374151",
+      borderTop: "1px solid rgba(75, 85, 99, 0.3)",
       marginTop: "2rem",
       paddingTop: "2rem",
+      paddingBottom: "2rem",
+      paddingLeft: "2rem",
+      paddingRight: "2rem",
       textAlign: "center",
       color: "#9ca3af",
+      background: "rgba(0, 0, 0, 0.2)",
+      margin: "2rem -2rem -2rem -2rem",
+    },
+    footerPattern: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      opacity: 0.03,
+      backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+      zIndex: 1,
     },
   };
 
@@ -468,7 +599,7 @@ export default function GharBazaarHomepage() {
           </nav>
 
           {/* Mobile Menu Button */}
-          <button style={styles.mobileMenuBtn}>
+          <button style={styles.mobileMenuBtn} onClick={toggleMobileMenu}>
             <svg
               width="24"
               height="24"
@@ -480,7 +611,11 @@ export default function GharBazaarHomepage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
+                d={
+                  isMobileMenuOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16M4 18h16"
+                }
               />
             </svg>
           </button>
@@ -507,7 +642,7 @@ export default function GharBazaarHomepage() {
                   </div>
                   <div
                     style={{
-                      display: "flex",
+                      display: isMobile ? "none" : "flex",
                       flexDirection: "column",
                       alignItems: "flex-start",
                     }}
@@ -564,6 +699,118 @@ export default function GharBazaarHomepage() {
                 Login / Sign Up
               </button>
             )}
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div style={styles.mobileMenu}>
+          <div style={styles.mobileMenuContent}>
+            {/* Mobile Navigation Links */}
+            <div style={styles.mobileNavLinks}>
+              <span
+                style={styles.mobileNavLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </span>
+              <span
+                style={styles.mobileNavLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Properties
+              </span>
+              <span
+                style={styles.mobileNavLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </span>
+              <span
+                style={styles.mobileNavLink}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Contact
+              </span>
+            </div>
+
+            {/* Mobile Auth Section */}
+            <div style={styles.mobileAuthSection}>
+              {isLoggedIn ? (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.75rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      ...styles.profileContainer,
+                      justifyContent: "center",
+                      paddingTop: "1rem",
+                      paddingBottom: "1rem",
+                      paddingLeft: "1rem",
+                      paddingRight: "1rem",
+                    }}
+                    onClick={() => {
+                      handleProfileClick();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <div style={styles.profileAvatar}>
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span style={styles.profileName}>Hi, {user?.name}</span>
+                      <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>
+                        View Dashboard
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    style={{
+                      ...styles.logoutBtn,
+                      width: "100%",
+                      paddingTop: "0.75rem",
+                      paddingBottom: "0.75rem",
+                      paddingLeft: "0.75rem",
+                      paddingRight: "0.75rem",
+                      textAlign: "center",
+                    }}
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button
+                  style={{
+                    ...styles.authBtn,
+                    width: "100%",
+                    paddingTop: "0.75rem",
+                    paddingBottom: "0.75rem",
+                    paddingLeft: "1rem",
+                    paddingRight: "1rem",
+                    textAlign: "center",
+                  }}
+                  onClick={() => {
+                    handleAuthClick();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  Login / Sign Up
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -636,29 +883,150 @@ export default function GharBazaarHomepage() {
 
       {/* Footer */}
       <footer style={styles.footer}>
+        <div style={styles.footerPattern}></div>
         <div style={styles.footerContent}>
           <div style={styles.footerSection}>
             <div style={styles.footerTitle}>🏠 GharBazaar</div>
             <p style={styles.footerText}>
-              Your trusted platform for finding homes in Nepal.
+              Your trusted platform for finding the perfect home in Nepal. We
+              connect property seekers with their dream properties across the
+              beautiful landscapes of Nepal.
             </p>
+            <div style={styles.footerSocialSection}>
+              <h4 style={styles.footerSubtitle}>Follow Us</h4>
+              <div style={styles.socialLinks}>
+                <a
+                  href="#"
+                  style={styles.socialLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#3b82f6";
+                    e.target.style.color = "white";
+                    e.target.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateY(0)";
+                  }}
+                >
+                  📘
+                </a>
+                <a
+                  href="#"
+                  style={styles.socialLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#3b82f6";
+                    e.target.style.color = "white";
+                    e.target.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateY(0)";
+                  }}
+                >
+                  🐦
+                </a>
+                <a
+                  href="#"
+                  style={styles.socialLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#3b82f6";
+                    e.target.style.color = "white";
+                    e.target.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateY(0)";
+                  }}
+                >
+                  📸
+                </a>
+                <a
+                  href="#"
+                  style={styles.socialLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#3b82f6";
+                    e.target.style.color = "white";
+                    e.target.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateY(0)";
+                  }}
+                >
+                  💼
+                </a>
+              </div>
+            </div>
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerSubtitle}>Quick Links</h4>
             <ul style={styles.footerList}>
               <li style={styles.footerListItem}>
-                <a href="#" style={styles.footerLink}>
-                  About Us
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  → About Us
                 </a>
               </li>
               <li style={styles.footerListItem}>
-                <a href="#" style={styles.footerLink}>
-                  Contact
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  → Contact Us
                 </a>
               </li>
               <li style={styles.footerListItem}>
-                <a href="#" style={styles.footerLink}>
-                  Help
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  → Help & Support
+                </a>
+              </li>
+              <li style={styles.footerListItem}>
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  → Privacy Policy
                 </a>
               </li>
             </ul>
@@ -667,23 +1035,67 @@ export default function GharBazaarHomepage() {
             <h4 style={styles.footerSubtitle}>Property Types</h4>
             <ul style={styles.footerList}>
               <li style={styles.footerListItem}>
-                <a href="#" style={styles.footerLink}>
-                  Rooms
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  🏠 Rooms for Rent
                 </a>
               </li>
               <li style={styles.footerListItem}>
-                <a href="#" style={styles.footerLink}>
-                  Flats
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  🏢 Apartments & Flats
                 </a>
               </li>
               <li style={styles.footerListItem}>
-                <a href="#" style={styles.footerLink}>
-                  Houses
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  🏘️ Houses & Villas
                 </a>
               </li>
               <li style={styles.footerListItem}>
-                <a href="#" style={styles.footerLink}>
-                  Land
+                <a
+                  href="#"
+                  style={styles.footerLink}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#3b82f6";
+                    e.target.style.transform = "translateX(5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#9ca3af";
+                    e.target.style.transform = "translateX(0)";
+                  }}
+                >
+                  🌍 Land & Plots
                 </a>
               </li>
             </ul>
@@ -691,14 +1103,25 @@ export default function GharBazaarHomepage() {
           <div style={styles.footerSection}>
             <h4 style={styles.footerSubtitle}>Contact Info</h4>
             <ul style={styles.footerList}>
-              <li style={styles.footerListItem}>Email: info@gharbazaar.com</li>
-              <li style={styles.footerListItem}>Phone: +977-1-4444444</li>
-              <li style={styles.footerListItem}>Kathmandu, Nepal</li>
+              <li style={styles.footerListItem}>
+                <span style={styles.footerText}>📧 info@gharbazaar.com</span>
+              </li>
+              <li style={styles.footerListItem}>
+                <span style={styles.footerText}>📞 +977-1-4444444</span>
+              </li>
+              <li style={styles.footerListItem}>
+                <span style={styles.footerText}>📍 Kathmandu, Nepal</span>
+              </li>
+              <li style={styles.footerListItem}>
+                <span style={styles.footerText}>🕒 24/7 Customer Support</span>
+              </li>
             </ul>
           </div>
         </div>
         <div style={styles.footerBottom}>
-          <p>&copy; 2025 GharBazaar. All rights reserved.</p>
+          <p>
+            &copy; 2025 GharBazaar. All rights reserved. | Made with ❤️ in Nepal
+          </p>
         </div>
       </footer>
     </div>
