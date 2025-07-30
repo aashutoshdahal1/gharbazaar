@@ -287,7 +287,7 @@ export default function GharBazaarHomepage() {
       paddingTop: "1rem",
     },
     hero: {
-      background: "linear-gradient(to right, #2563eb, #1e40af)",
+      background: "linear-gradient(to right, #10b981, #1e40af)",
       color: "white",
       padding: isMobile ? "2rem 0" : "5rem 0",
       textAlign: "center",
@@ -328,7 +328,7 @@ export default function GharBazaarHomepage() {
       fontSize: isMobile ? "0.875rem" : "1rem",
     },
     searchBtn: {
-      backgroundColor: "#3b82f6",
+      backgroundColor: "#10b981",
       color: "white",
       padding: isMobile ? "0.75rem 1rem" : "1rem 1.5rem",
       border: "none",
@@ -409,8 +409,8 @@ export default function GharBazaarHomepage() {
       padding: isMobile ? "0.75rem" : "1rem",
     },
     cardType: {
-      backgroundColor: "#dbeafe",
-      color: "#1e40af",
+      backgroundColor: "#10b981",
+      color: "white",
       fontSize: "0.75rem",
       padding: "0.25rem 0.5rem",
       borderRadius: "9999px",
@@ -430,7 +430,7 @@ export default function GharBazaarHomepage() {
       textAlign: "center",
     },
     viewAllLink: {
-      color: "#2563eb",
+      color: "#10b981",
       fontWeight: "600",
       textDecoration: "none",
       cursor: "pointer",
