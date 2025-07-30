@@ -1,14 +1,29 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const GharBazaarAuth = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const API_BASE_URL = "http://localhost:5000/api";
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
+    setError("");
+    setSuccess("");
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+    });
   };
 
   const handleInputChange = (e) => {
@@ -17,16 +32,54 @@ const GharBazaarAuth = () => {
       ...prev,
       [name]: value,
     }));
+    setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log(formData);
-    if (isLogin) {
-      console.log("Logging in...");
-    } else {
-      console.log("Signing up...");
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const endpoint = isLogin ? "/auth/login" : "/auth/signup";
+      const payload = isLogin
+        ? { email: formData.email, password: formData.password }
+        : {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          };
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Store token and user data
+        localStorage.setItem("token", data.data.token);
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+
+        setSuccess(data.message);
+
+        // Redirect to dashboard after successful authentication
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+      } else {
+        setError(data.message);
+      }
+    } catch (error) {
+      console.error("Auth error:", error);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -222,6 +275,24 @@ const GharBazaarAuth = () => {
       textDecoration: "underline",
       cursor: "pointer",
     },
+    errorMessage: {
+      backgroundColor: "#fee2e2",
+      color: "#dc2626",
+      padding: "12px 16px",
+      borderRadius: "8px",
+      margin: "8px 16px",
+      fontSize: "14px",
+      textAlign: "center",
+    },
+    successMessage: {
+      backgroundColor: "#dcfce7",
+      color: "#16a34a",
+      padding: "12px 16px",
+      borderRadius: "8px",
+      margin: "8px 16px",
+      fontSize: "14px",
+      textAlign: "center",
+    },
   };
 
   return (
@@ -262,7 +333,26 @@ const GharBazaarAuth = () => {
             <h2 style={styles.heading}>
               {isLogin ? "Welcome Back to GharBazaar" : "Welcome to GharBazaar"}
             </h2>
+
+            {error && <div style={styles.errorMessage}>{error}</div>}
+
+            {success && <div style={styles.successMessage}>{success}</div>}
+
             <form onSubmit={handleSubmit}>
+              {!isLogin && (
+                <div style={styles.inputContainer}>
+                  <label style={styles.inputLabel}>
+                    <input
+                      name="name"
+                      placeholder="Full Name"
+                      style={styles.inputField}
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </label>
+                </div>
+              )}
               <div style={styles.inputContainer}>
                 <label style={styles.inputLabel}>
                   <input
@@ -271,6 +361,7 @@ const GharBazaarAuth = () => {
                     style={styles.inputField}
                     value={formData.email}
                     onChange={handleInputChange}
+                    type="email"
                     required
                   />
                 </label>
@@ -289,8 +380,24 @@ const GharBazaarAuth = () => {
                 </label>
               </div>
               <div style={{ ...styles.inputContainer, paddingTop: 0 }}>
-                <button type="submit" style={styles.authButton}>
-                  <span>{isLogin ? "Log In" : "Sign Up"}</span>
+                <button
+                  type="submit"
+                  style={{
+                    ...styles.authButton,
+                    opacity: loading ? 0.6 : 1,
+                    cursor: loading ? "not-allowed" : "pointer",
+                  }}
+                  disabled={loading}
+                >
+                  <span>
+                    {loading
+                      ? isLogin
+                        ? "Logging in..."
+                        : "Signing up..."
+                      : isLogin
+                      ? "Log In"
+                      : "Sign Up"}
+                  </span>
                 </button>
               </div>
             </form>
@@ -308,13 +415,6 @@ const GharBazaarAuth = () => {
 
 export default GharBazaarAuth;
 
-
-const HomeScreen = ()=>{
-  return(
-    <div>
-      
-
-    </div>
-
-  )
-}
+const HomeScreen = () => {
+  return <div></div>;
+};

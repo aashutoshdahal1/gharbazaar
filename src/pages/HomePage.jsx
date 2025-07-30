@@ -60,15 +60,7 @@ export default function GharBazaarHomepage() {
       fontWeight: "bold",
       color: "#111827",
     },
-    nav: {
-      display: "flex",
-      gap: "2rem",
-    },
-    navLink: {
-      color: "#6b7280",
-      textDecoration: "none",
-      cursor: "pointer",
-    },
+
     authButtons: {
       display: "flex",
       alignItems: "center",
@@ -281,19 +273,6 @@ export default function GharBazaarHomepage() {
         <div style={styles.headerContent}>
           {/* Logo */}
           <div style={styles.logo}>🏠 GharBazaar</div>
-
-          {/* Navigation */}
-          <nav style={styles.nav}>
-            <a href="#" style={styles.navLink}>
-              About
-            </a>
-            <a href="#" style={styles.navLink}>
-              Contact
-            </a>
-            <a href="#" style={styles.navLink}>
-              Help
-            </a>
-          </nav>
 
           {/* Auth Buttons */}
           <div style={styles.authButtons}>
