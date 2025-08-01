@@ -9,6 +9,7 @@ import MyListings from "./pages/MyListings";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
+import AddListing from "./pages/AddListing";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -56,6 +57,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddProperty />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-listing"
+          element={
+            <ProtectedRoute>
+              <AddListing />
             </ProtectedRoute>
           }
         />
