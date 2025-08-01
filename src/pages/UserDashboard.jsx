@@ -36,12 +36,12 @@ const UserDashboard = () => {
 
   const handleAddPropertyClick = () => {
     // Navigate to add property page
-    navigate("/add-property");
+    navigate("/add-listing");
   };
 
   const handleBrowsePropertiesClick = () => {
     // Navigate to browse properties page
-    navigate("/properties");
+    navigate("/filter");
   };
 
   const handleViewMessagesClick = () => {

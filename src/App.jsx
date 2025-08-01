@@ -9,8 +9,8 @@ import MyListings from "./pages/MyListings";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
-import AddListing from "./pages/AddListing";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AddListing from "./pages/AddListing";
 
 function App() {
   return (
@@ -20,6 +20,7 @@ function App() {
         <Route path="/login-signup" element={<GharBazaarAuth />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/filter" element={<FilterPage />} />
+        <Route path="/add-listing" element={<AddListing />} />
         <Route
           path="/dashboard"
           element={
