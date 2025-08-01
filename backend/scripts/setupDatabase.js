@@ -64,6 +64,4 @@ async function setupDatabase() {
     }
   }
 }
-
-// Run the setup
-setupDatabase();
+module.exports = setupDatabase;

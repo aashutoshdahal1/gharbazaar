@@ -50,9 +50,9 @@ CREATE TABLE ratings (
 -- REPORTS
 CREATE TABLE reports (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  reporter_id INT NOT NULL,
-  reported_user_id INT NULL,
-  reported_listing_id INT NULL,
+  reporter_id INT, 
+  reported_user_id INT,
+  reported_listing_id INT,
   reason TEXT NOT NULL,
   status ENUM('pending', 'reviewed', 'dismissed') DEFAULT 'pending',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -60,6 +60,7 @@ CREATE TABLE reports (
   FOREIGN KEY (reported_user_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (reported_listing_id) REFERENCES listings(id) ON DELETE SET NULL
 );
+
 
 -- OPTIONAL: SEARCH LOGS
 CREATE TABLE search_logs (
