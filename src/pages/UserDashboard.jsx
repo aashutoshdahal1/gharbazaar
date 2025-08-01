@@ -438,7 +438,7 @@ const UserDashboard = () => {
                   e.target.style.transform = "translateY(0)";
                 }}
               >
-                View Messages
+                View Message
               </button>
               <button
                 style={styles.actionButton}

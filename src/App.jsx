@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddListing from "./pages/AddListing";
+import ViewMessages from "./pages/view-message"; // Updated import path to match your file name
 
 function App() {
   return (
@@ -58,6 +59,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddProperty />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <ViewMessages />
             </ProtectedRoute>
           }
         />
