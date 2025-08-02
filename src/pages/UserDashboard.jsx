@@ -51,7 +51,7 @@ const UserDashboard = () => {
 
   const handleEditProfileClick = () => {
     // Navigate to edit profile page
-    navigate("/profile/edit");
+    navigate("/edit-profile");
   };
 
   const verifyToken = useCallback(
@@ -438,7 +438,7 @@ const UserDashboard = () => {
                   e.target.style.transform = "translateY(0)";
                 }}
               >
-                View Message
+                View Messages
               </button>
               <button
                 style={styles.actionButton}
