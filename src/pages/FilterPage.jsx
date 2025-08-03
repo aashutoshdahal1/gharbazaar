@@ -1082,7 +1082,12 @@ const PropertyListing = () => {
                           style={styles.contactButton}
                           onClick={(e) => {
                             e.stopPropagation();
-                            // TODO: Implement contact functionality
+                            if (property.phone_number) {
+                              window.open(
+                                `tel:${property.phone_number}`,
+                                "_self"
+                              );
+                            }
                           }}
                           onMouseEnter={(e) => {
                             e.target.style.backgroundColor = "#f1f5f9";
@@ -1092,8 +1097,11 @@ const PropertyListing = () => {
                             e.target.style.backgroundColor = "#f8fafc";
                             e.target.style.borderColor = "#d1d5db";
                           }}
+                          title={
+                            property.phone_number || "No phone number available"
+                          }
                         >
-                          Contact
+                          {property.phone_number ? "📞 Call" : "Contact"}
                         </button>
                       </div>
                     </div>

@@ -156,6 +156,11 @@ const MyListings = () => {
                       <strong>Area:</strong> {listing.area}
                     </p>
                   )}
+                  {listing.phone_number && (
+                    <p className="listing-details">
+                      <strong>Contact:</strong> {listing.phone_number}
+                    </p>
+                  )}
                   {listing.description && (
                     <p className="listing-details text-ellipsis">
                       <strong>Description:</strong> {listing.description}

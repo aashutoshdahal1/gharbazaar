@@ -19,6 +19,7 @@ CREATE TABLE listings (
   price DECIMAL(12, 2) NOT NULL,
   location VARCHAR(255) NOT NULL,
   area VARCHAR(100),
+  phone_number VARCHAR(20),
   images TEXT,
   latitude DECIMAL(10, 8) NULL,
   longitude DECIMAL(11, 8) NULL,

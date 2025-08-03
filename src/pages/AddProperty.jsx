@@ -56,6 +56,7 @@ export default function AddProperty() {
     price: "",
     address: "",
     area: "",
+    phoneNumber: "",
   });
 
   const [images, setImages] = useState([]);
@@ -300,6 +301,23 @@ export default function AddProperty() {
                 value={formData.area}
                 onChange={handleInputChange}
                 placeholder="e.g., 1200 sq ft"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="phoneNumber">Contact Phone Number *</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleInputChange}
+                placeholder="e.g., 9841234567 or +977-9841234567"
+                required
+                pattern="[0-9+\-\s]+"
+                title="Please enter a valid phone number"
               />
             </div>
           </div>

@@ -98,6 +98,8 @@ router.post(
       address,
       description,
       purpose,
+      area,
+      phoneNumber,
       latitude,
       longitude,
     } = req.body;
@@ -123,8 +125,8 @@ router.post(
       // Insert new property using listings table structure
       const [result] = await pool.execute(
         `INSERT INTO listings 
-       (user_id, title, description, property_type, purpose, price, location, images, latitude, longitude, created_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+       (user_id, title, description, property_type, purpose, price, location, area, phone_number, images, latitude, longitude, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
         [
           req.user.id,
           title,
@@ -133,6 +135,8 @@ router.post(
           purpose || "rent",
           price,
           address,
+          area || null,
+          phoneNumber || null,
           JSON.stringify(imageUrls),
           latitude || null,
           longitude || null,
@@ -211,6 +215,8 @@ router.put(
         address,
         description,
         purpose,
+        area,
+        phoneNumber,
         latitude,
         longitude,
         existingImages,
@@ -257,7 +263,7 @@ router.put(
       // Update property
       await pool.execute(
         `UPDATE listings 
-       SET title = ?, description = ?, property_type = ?, purpose = ?, price = ?, location = ?, images = ?, latitude = ?, longitude = ?
+       SET title = ?, description = ?, property_type = ?, purpose = ?, price = ?, location = ?, area = ?, phone_number = ?, images = ?, latitude = ?, longitude = ?
        WHERE id = ?`,
         [
           title,
@@ -266,6 +272,8 @@ router.put(
           purpose || "rent",
           price,
           address,
+          area || null,
+          phoneNumber || null,
           JSON.stringify(allImages),
           latitude || null,
           longitude || null,

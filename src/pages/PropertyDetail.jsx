@@ -368,6 +368,12 @@ const PropertyDetail = () => {
                   <div style={styles.detailValue}>{property.area}</div>
                 </div>
               )}
+              {property.phone_number && (
+                <div style={styles.detailItem}>
+                  <div style={styles.detailLabel}>Contact Number</div>
+                  <div style={styles.detailValue}>{property.phone_number}</div>
+                </div>
+              )}
               <div style={styles.detailItem}>
                 <div style={styles.detailLabel}>Listed On</div>
                 <div style={styles.detailValue}>
@@ -426,7 +432,16 @@ const PropertyDetail = () => {
               <p style={{ color: "#6b7280", marginBottom: "16px" }}>
                 Interested in this property? Get in touch with the owner.
               </p>
-              <button style={styles.contactButton}>📞 Call Owner</button>
+              {property.phone_number && (
+                <button
+                  style={styles.contactButton}
+                  onClick={() =>
+                    window.open(`tel:${property.phone_number}`, "_self")
+                  }
+                >
+                  📞 Call {property.phone_number}
+                </button>
+              )}
               <button
                 style={{
                   ...styles.contactButton,

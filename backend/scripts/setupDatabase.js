@@ -51,6 +51,9 @@ async function setupDatabase() {
       }
 
       console.log("🎉 Database setup completed successfully!");
+
+      // Check and add missing columns
+      await ensureRequiredColumns(connection);
     } else {
       console.error("❌ SQL file not found:", sqlFilePath);
     }
@@ -62,6 +65,68 @@ async function setupDatabase() {
       await connection.end();
       console.log("Database connection closed");
     }
+  }
+}
+
+async function ensureRequiredColumns(connection) {
+  console.log("🔍 Checking for missing columns...");
+
+  try {
+    // Define required columns for each table
+    const requiredColumns = {
+      listings: {
+        phone_number: "VARCHAR(20)",
+        area: "VARCHAR(100)",
+        latitude: "DECIMAL(10, 8)",
+        longitude: "DECIMAL(11, 8)",
+      },
+      users: {
+        role: "ENUM('user', 'admin') DEFAULT 'user'",
+      },
+    };
+
+    for (const [tableName, columns] of Object.entries(requiredColumns)) {
+      console.log(`📋 Checking table: ${tableName}`);
+
+      // Get existing columns
+      const [existingColumns] = await connection.execute(
+        `
+        SELECT COLUMN_NAME 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() 
+        AND TABLE_NAME = ?
+      `,
+        [tableName]
+      );
+
+      const existingColumnNames = existingColumns.map((col) => col.COLUMN_NAME);
+
+      // Check each required column
+      for (const [columnName, columnDefinition] of Object.entries(columns)) {
+        if (!existingColumnNames.includes(columnName)) {
+          console.log(`➕ Adding missing column: ${tableName}.${columnName}`);
+
+          try {
+            await connection.execute(`
+              ALTER TABLE ${tableName} 
+              ADD COLUMN ${columnName} ${columnDefinition}
+            `);
+            console.log(`✅ Successfully added ${tableName}.${columnName}`);
+          } catch (error) {
+            console.error(
+              `❌ Error adding ${tableName}.${columnName}:`,
+              error.message
+            );
+          }
+        } else {
+          console.log(`✅ Column ${tableName}.${columnName} already exists`);
+        }
+      }
+    }
+
+    console.log("🎉 Column verification completed!");
+  } catch (error) {
+    console.error("❌ Error checking columns:", error.message);
   }
 }
 module.exports = setupDatabase;
