@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./AddProperty.css";
-
+import url from "../apiurl";
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -170,7 +170,7 @@ export default function AddProperty() {
         submitData.append("images", image);
       });
 
-      const response = await fetch("http://localhost:5001/api/properties", {
+      const response = await fetch(`${url}api/properties`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

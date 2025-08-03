@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import url from "../apiurl";
 const MyListings = () => {
   const navigate = useNavigate();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_BASE_URL = "http://localhost:5001/api";
+  const API_BASE_URL = url + "api";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,7 +116,7 @@ const MyListings = () => {
                 <div key={listing.id} className="listing-card">
                   {firstImage ? (
                     <img
-                      src={`http://localhost:5001${firstImage}`}
+                      src={`${url}${firstImage}`}
                       alt={listing.title}
                       className="listing-image"
                       onError={(e) => {

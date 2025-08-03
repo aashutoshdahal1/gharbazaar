@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./AddProperty.css";
-
+import url from "../apiurl";
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -78,14 +78,11 @@ export default function EditProperty() {
           return;
         }
 
-        const response = await fetch(
-          `http://localhost:5001/api/properties/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${url}api/properties/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         const data = await response.json();
 
@@ -224,16 +221,13 @@ export default function EditProperty() {
         submitData.append("images", image);
       });
 
-      const response = await fetch(
-        `http://localhost:5001/api/properties/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: submitData,
-        }
-      );
+      const response = await fetch(`${url}api/properties/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: submitData,
+      });
 
       const data = await response.json();
 
@@ -420,7 +414,7 @@ export default function EditProperty() {
                 {existingImages.map((imageUrl, index) => (
                   <div key={`existing-${index}`} className="image-preview">
                     <img
-                      src={`http://localhost:5001${imageUrl}`}
+                      src={`${url}${imageUrl}`}
                       alt={`Existing ${index + 1}`}
                       onError={(e) => {
                         e.target.style.display = "none";

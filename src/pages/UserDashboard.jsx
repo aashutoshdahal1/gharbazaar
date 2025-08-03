@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
+import url from "../apiurl"; // Import the API base URL
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_BASE_URL = "http://localhost:5001/api";
+  const API_BASE_URL = url + "api";
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");

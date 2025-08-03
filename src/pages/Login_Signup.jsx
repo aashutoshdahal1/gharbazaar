@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import url from "../apiurl";
 const GharBazaarAuth = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -13,7 +13,7 @@ const GharBazaarAuth = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const API_BASE_URL = "http://localhost:5000/api";
+  const API_BASE_URL = url + "api";
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
