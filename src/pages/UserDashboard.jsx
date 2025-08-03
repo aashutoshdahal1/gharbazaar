@@ -6,6 +6,12 @@ const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [stats, setStats] = useState({
+    activeListings: 0,
+    totalViews: 0,
+    savedProperties: 0,
+    messages: 0,
+  });
 
   const API_BASE_URL = url + "api";
 
@@ -54,6 +60,36 @@ const UserDashboard = () => {
     navigate("/edit-profile");
   };
 
+  const fetchUserStats = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      // Fetch user's listings count
+      const listingsResponse = await fetch(
+        `${API_BASE_URL}/properties/my-listings`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const listingsData = await listingsResponse.json();
+
+      if (listingsData.success) {
+        setStats((prevStats) => ({
+          ...prevStats,
+          activeListings: listingsData.data.length,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+    }
+  }, [API_BASE_URL]);
+
   const verifyToken = useCallback(
     async (token) => {
       try {
@@ -71,6 +107,8 @@ const UserDashboard = () => {
           handleLogout();
         } else {
           setUser(data.data.user);
+          // Fetch stats after user verification
+          await fetchUserStats();
         }
       } catch (error) {
         console.error("Token verification error:", error);
@@ -79,7 +117,7 @@ const UserDashboard = () => {
         setLoading(false);
       }
     },
-    [handleLogout]
+    [handleLogout, API_BASE_URL, fetchUserStats]
   );
 
   useEffect(() => {
@@ -99,6 +137,18 @@ const UserDashboard = () => {
       handleLogout();
     }
   }, [navigate, verifyToken, handleLogout]);
+
+  // Refresh stats when component mounts or when user navigates back
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user) {
+        fetchUserStats();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [user, fetchUserStats]);
 
   const styles = {
     designRoot: {
@@ -222,6 +272,8 @@ const UserDashboard = () => {
       boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
       border: "1px solid #e5e7eb",
       textAlign: "center",
+      cursor: "pointer",
+      transition: "all 0.2s ease",
     },
     statNumber: {
       fontSize: "32px",
@@ -377,20 +429,59 @@ const UserDashboard = () => {
           </div>
 
           <div style={styles.statsContainer}>
-            <div style={styles.statCard}>
-              <div style={styles.statNumber}>0</div>
+            <div
+              style={styles.statCard}
+              onClick={handleMyListingsClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(0, 0, 0, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 1px 3px rgba(0, 0, 0, 0.1)";
+              }}
+            >
+              <div style={styles.statNumber}>{stats.activeListings}</div>
               <div style={styles.statLabel}>Active Listings</div>
             </div>
             <div style={styles.statCard}>
-              <div style={styles.statNumber}>0</div>
+              <div style={styles.statNumber}>{stats.totalViews}</div>
               <div style={styles.statLabel}>Total Views</div>
             </div>
-            <div style={styles.statCard}>
-              <div style={styles.statNumber}>0</div>
+            <div
+              style={styles.statCard}
+              onClick={handleFavoritesClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(0, 0, 0, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 1px 3px rgba(0, 0, 0, 0.1)";
+              }}
+            >
+              <div style={styles.statNumber}>{stats.savedProperties}</div>
               <div style={styles.statLabel}>Saved Properties</div>
             </div>
-            <div style={styles.statCard}>
-              <div style={styles.statNumber}>0</div>
+            <div
+              style={styles.statCard}
+              onClick={handleViewMessagesClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(0, 0, 0, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 1px 3px rgba(0, 0, 0, 0.1)";
+              }}
+            >
+              <div style={styles.statNumber}>{stats.messages}</div>
               <div style={styles.statLabel}>Messages</div>
             </div>
           </div>

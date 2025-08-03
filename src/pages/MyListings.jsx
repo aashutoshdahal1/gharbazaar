@@ -109,17 +109,24 @@ const MyListings = () => {
           </div>
           <div className="listings-grid">
             {listings.map((listing) => {
-              const images = listing.images ? JSON.parse(listing.images) : [];
+              let images = [];
+              try {
+                images = listing.images ? JSON.parse(listing.images) : [];
+              } catch (error) {
+                console.error("Error parsing images JSON:", error);
+                images = [];
+              }
               const firstImage = images.length > 0 ? images[0] : null;
 
               return (
                 <div key={listing.id} className="listing-card">
                   {firstImage ? (
                     <img
-                      src={`${url}${firstImage}`}
+                      src={`${url.replace(/\/$/, "")}${firstImage}`}
                       alt={listing.title}
                       className="listing-image"
                       onError={(e) => {
+                        console.log("Image failed to load:", e.target.src);
                         e.target.style.display = "none";
                         e.target.nextSibling.style.display = "flex";
                       }}
