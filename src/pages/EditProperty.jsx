@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -44,8 +44,9 @@ function LocationSelector({ position, setPosition }) {
   );
 }
 
-export default function AddProperty() {
+export default function EditProperty() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
@@ -60,28 +61,74 @@ export default function AddProperty() {
 
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
   const [position, setPosition] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Get user's current location
+  // Fetch existing property data
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setPosition({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        () => {
-          // Default to Kathmandu if geolocation fails
-          setPosition({ lat: 27.7172, lng: 85.324 });
+    const fetchProperty = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
         }
-      );
-    }
-  }, []);
+
+        const response = await fetch(
+          `http://localhost:5001/api/properties/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+          const property = data.data;
+          setFormData({
+            title: property.title || "",
+            description: property.description || "",
+            propertyType: property.property_type || "",
+            purpose: property.purpose || "rent",
+            price: property.price || "",
+            address: property.location || "",
+            area: property.area || "",
+          });
+
+          // Set existing images
+          if (property.images) {
+            const imageUrls = JSON.parse(property.images);
+            setExistingImages(imageUrls);
+          }
+
+          // Set position if coordinates exist
+          if (property.latitude && property.longitude) {
+            setPosition({
+              lat: parseFloat(property.latitude),
+              lng: parseFloat(property.longitude),
+            });
+          } else {
+            setPosition({ lat: 27.7172, lng: 85.324 });
+          }
+        } else {
+          setError("Failed to fetch property details");
+        }
+      } catch (error) {
+        console.error("Error fetching property:", error);
+        setError("An error occurred while fetching property details");
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+
+    fetchProperty();
+  }, [id, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +141,7 @@ export default function AddProperty() {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
 
-    if (files.length + images.length > 10) {
+    if (files.length + images.length + existingImages.length > 10) {
       setError("Maximum 10 images allowed");
       return;
     }
@@ -133,7 +180,11 @@ export default function AddProperty() {
     });
   };
 
-  const removeImage = (index) => {
+  const removeExistingImage = (index) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewImage = (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
@@ -165,44 +216,58 @@ export default function AddProperty() {
         submitData.append("longitude", position.lng);
       }
 
-      // Append images
+      // Append existing images
+      submitData.append("existingImages", JSON.stringify(existingImages));
+
+      // Append new images
       images.forEach((image) => {
         submitData.append("images", image);
       });
 
-      const response = await fetch("http://localhost:5001/api/properties", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: submitData,
-      });
+      const response = await fetch(
+        `http://localhost:5001/api/properties/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: submitData,
+        }
+      );
 
       const data = await response.json();
 
       if (data.success) {
-        setSuccess("Property listed successfully!");
+        setSuccess("Property updated successfully!");
         setTimeout(() => {
           navigate("/my-listings");
         }, 2000);
       } else {
-        setError(data.message || "Failed to create listing");
+        setError(data.message || "Failed to update listing");
       }
     } catch (error) {
-      console.error("Error creating listing:", error);
-      setError("An error occurred while creating the listing");
+      console.error("Error updating listing:", error);
+      setError("An error occurred while updating the listing");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetchLoading) {
+    return (
+      <div className="add-property-container">
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <p>Loading property details...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="add-property-container">
       <div className="add-property-header">
-        <h1>List Your Property</h1>
-        <p>
-          Share your property with thousands of potential buyers and renters
-        </p>
+        <h1>Edit Your Property</h1>
+        <p>Update your property details and manage your listing</p>
       </div>
 
       <form onSubmit={handleSubmit} className="add-property-form">
@@ -347,15 +412,43 @@ export default function AddProperty() {
         <div className="form-section">
           <h2>Property Images</h2>
 
+          {/* Existing Images */}
+          {existingImages.length > 0 && (
+            <div className="form-group">
+              <label>Current Images</label>
+              <div className="image-previews">
+                {existingImages.map((imageUrl, index) => (
+                  <div key={`existing-${index}`} className="image-preview">
+                    <img
+                      src={`http://localhost:5001${imageUrl}`}
+                      alt={`Existing ${index + 1}`}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="remove-image"
+                      onClick={() => removeExistingImage(index)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* New Images Upload */}
           <div className="form-group">
-            <label>Upload Images (Max 10 images, 5MB each)</label>
+            <label>Add More Images (Max 10 images total, 5MB each)</label>
             <div
               className="image-upload-area"
               onClick={() => fileInputRef.current?.click()}
             >
               <div className="upload-placeholder">
                 <i className="upload-icon">📁</i>
-                <p>Click to upload images or drag and drop</p>
+                <p>Click to upload additional images</p>
                 <p className="upload-info">PNG, JPG, GIF up to 5MB</p>
               </div>
               <input
@@ -369,20 +462,24 @@ export default function AddProperty() {
             </div>
           </div>
 
+          {/* New Image Previews */}
           {imagePreviews.length > 0 && (
-            <div className="image-previews">
-              {imagePreviews.map((preview, index) => (
-                <div key={index} className="image-preview">
-                  <img src={preview.url} alt={`Preview ${index + 1}`} />
-                  <button
-                    type="button"
-                    className="remove-image"
-                    onClick={() => removeImage(index)}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+            <div className="form-group">
+              <label>New Images to Add</label>
+              <div className="image-previews">
+                {imagePreviews.map((preview, index) => (
+                  <div key={`new-${index}`} className="image-preview">
+                    <img src={preview.url} alt={`New Preview ${index + 1}`} />
+                    <button
+                      type="button"
+                      className="remove-image"
+                      onClick={() => removeNewImage(index)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -392,12 +489,12 @@ export default function AddProperty() {
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/my-listings")}
           >
             Cancel
           </button>
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Publishing..." : "Publish Property"}
+            {loading ? "Updating..." : "Update Property"}
           </button>
         </div>
       </form>

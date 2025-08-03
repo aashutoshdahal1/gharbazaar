@@ -9,9 +9,9 @@ import MyListings from "./pages/MyListings";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
+import EditProperty from "./pages/EditProperty";
 import EditProfile from "./pages/EditProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AddListing from "./pages/AddListing";
 import ViewMessages from "./pages/view-message"; // Updated import path to match your file name
 
 function App() {
@@ -22,9 +22,16 @@ function App() {
         <Route path="/login-signup" element={<GharBazaarAuth />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/filter" element={<FilterPage />} />
-        <Route path="/add-listing" element={<AddListing />} />
         <Route
           path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <UserDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-dashboard"
           element={
             <ProtectedRoute>
               <UserDashboard />
@@ -64,10 +71,18 @@ function App() {
           }
         />
         <Route
-          path="/add-property"
+          path="/add-listing"
           element={
             <ProtectedRoute>
               <AddProperty />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-listing/:id"
+          element={
+            <ProtectedRoute>
+              <EditProperty />
             </ProtectedRoute>
           }
         />
@@ -76,14 +91,6 @@ function App() {
           element={
             <ProtectedRoute>
               <ViewMessages />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/add-listing"
-          element={
-            <ProtectedRoute>
-              <AddListing />
             </ProtectedRoute>
           }
         />

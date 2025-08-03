@@ -20,6 +20,8 @@ CREATE TABLE listings (
   location VARCHAR(255) NOT NULL,
   area VARCHAR(100),
   images TEXT,
+  latitude DECIMAL(10, 8) NULL,
+  longitude DECIMAL(11, 8) NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
