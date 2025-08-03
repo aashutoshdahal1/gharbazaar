@@ -5,6 +5,7 @@ import "./styles/global.css";
 import HomePage from "./pages/HomePage";
 import GharBazaarAuth from "./pages/Login_Signup";
 import FilterPage from "./pages/FilterPage";
+import PropertyDetail from "./pages/PropertyDetail";
 import UserDashboard from "./pages/UserDashboard";
 import MyListings from "./pages/MyListings";
 import Favorites from "./pages/Favorites";
@@ -23,6 +24,7 @@ function App() {
         <Route path="/login-signup" element={<GharBazaarAuth />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/filter" element={<FilterPage />} />
+        <Route path="/property/:id" element={<PropertyDetail />} />
         <Route
           path="/dashboard"
           element={

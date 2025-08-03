@@ -1,54 +1,123 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import url from "../apiurl";
 
 const PropertyListing = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("grid");
-  const [priceRange, setPriceRange] = useState([0, 50000]);
-  const [propertyType, setPropertyType] = useState("Apartment");
-  const [roomType, setRoomType] = useState("");
+  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [propertyType, setPropertyType] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [properties, setProperties] = useState([]);
+  const [filteredProperties, setFilteredProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [totalProperties, setTotalProperties] = useState(0);
 
-  const properties = [
-    {
-      id: 1,
-      title: "Cozy Apartment in Thamel",
-      location: "Thamel, Kathmandu",
-      price: 8000,
-      image:
-        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop",
-      type: "Apartment",
-    },
-    {
-      id: 2,
-      title: "Spacious House in Boudha",
-      location: "Boudha, Kathmandu",
-      price: 12000,
-      image:
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
-      type: "House",
-    },
-    {
-      id: 3,
-      title: "Condo with City View in Patan",
-      location: "Patan, Lalitpur",
-      price: 15000,
-      image:
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop",
-      type: "Condo",
-    },
-    {
-      id: 4,
-      title: "Townhouse in Lalitpur",
-      location: "Lalitpur, Bagmati",
-      price: 18000,
-      image:
-        "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop",
-      type: "Townhouse",
-    },
-  ];
+  const API_BASE_URL = url + "api";
+
+  // Fetch all properties from backend
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/properties`);
+        const data = await response.json();
+
+        if (data.success) {
+          setProperties(data.data);
+          setFilteredProperties(data.data);
+          setTotalProperties(data.data.length);
+        } else {
+          setError("Failed to fetch properties");
+        }
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+        setError("An error occurred while fetching properties");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, [API_BASE_URL]);
+
+  // Filter properties based on criteria
+  useEffect(() => {
+    let filtered = properties.filter((property) => {
+      const priceInRange =
+        property.price >= priceRange[0] && property.price <= priceRange[1];
+
+      const typeMatch =
+        !propertyType ||
+        property.property_type?.toLowerCase() === propertyType.toLowerCase();
+
+      const purposeMatch =
+        !purpose || property.purpose?.toLowerCase() === purpose.toLowerCase();
+
+      const searchMatch =
+        !searchQuery ||
+        property.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return priceInRange && typeMatch && purposeMatch && searchMatch;
+    });
+
+    // Sort properties by price (optional)
+    filtered.sort((a, b) => {
+      if (purpose === "rent") {
+        return a.price - b.price; // Ascending for rent
+      }
+      return b.price - a.price; // Descending for sale
+    });
+
+    setFilteredProperties(filtered);
+    setTotalProperties(filtered.length);
+  }, [properties, priceRange, propertyType, purpose, searchQuery]);
 
   const handlePriceChange = (index, value) => {
     const newRange = [...priceRange];
-    newRange[index] = parseInt(value);
+    newRange[index] = parseInt(value) || 0;
+
+    // Ensure min is not greater than max
+    if (index === 0 && newRange[0] > newRange[1]) {
+      newRange[1] = newRange[0];
+    }
+    if (index === 1 && newRange[1] < newRange[0]) {
+      newRange[0] = newRange[1];
+    }
+
     setPriceRange(newRange);
+  };
+
+  const resetFilters = () => {
+    setPriceRange([0, 100000]);
+    setPropertyType("");
+    setPurpose("");
+    setSearchQuery("");
+  };
+
+  const handleSearch = () => {
+    // Search functionality is handled by useEffect above
+  };
+
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
+  const handleAddProperty = () => {
+    navigate("/add-listing");
+  };
+
+  const handleViewListing = (propertyId) => {
+    navigate(`/property/${propertyId}`);
+  };
+
+  const handleToggleFavorite = (propertyId) => {
+    // TODO: Implement favorites functionality
+    console.log("Toggle favorite for property:", propertyId);
   };
 
   const styles = {
@@ -80,6 +149,7 @@ const PropertyListing = () => {
       fontSize: "24px",
       fontWeight: "bold",
       color: "#2563eb",
+      cursor: "pointer",
     },
     nav: {
       display: "flex",
@@ -89,10 +159,12 @@ const PropertyListing = () => {
       color: "#374151",
       textDecoration: "none",
       fontWeight: "500",
+      cursor: "pointer",
     },
     navLinkInactive: {
       color: "#6b7280",
       textDecoration: "none",
+      cursor: "pointer",
     },
     rightHeader: {
       display: "flex",
@@ -136,6 +208,7 @@ const PropertyListing = () => {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      cursor: "pointer",
     },
     mainContent: {
       maxWidth: "1280px",
@@ -275,61 +348,153 @@ const PropertyListing = () => {
     },
     propertyCard: {
       backgroundColor: "white",
-      borderRadius: "8px",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+      borderRadius: "12px",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
       overflow: "hidden",
-      transition: "box-shadow 0.2s ease",
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+      border: "1px solid #e5e7eb",
+    },
+    propertyCardHover: {
+      transform: "translateY(-4px)",
+      boxShadow: "0 8px 25px rgba(0, 0, 0, 0.15)",
     },
     imageContainer: {
       position: "relative",
+      overflow: "hidden",
     },
     propertyImage: {
       width: "100%",
-      height: "192px",
+      height: "220px",
       objectFit: "cover",
+      transition: "transform 0.3s ease",
+    },
+    imageOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background:
+        "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 100%)",
+      opacity: 0,
+      transition: "opacity 0.3s ease",
+    },
+    propertyBadge: {
+      position: "absolute",
+      top: "12px",
+      left: "12px",
+      backgroundColor: "#10b981",
+      color: "white",
+      padding: "4px 8px",
+      borderRadius: "6px",
+      fontSize: "11px",
+      fontWeight: "600",
+      textTransform: "uppercase",
     },
     heartButton: {
       position: "absolute",
       top: "12px",
       right: "12px",
       padding: "8px",
-      backgroundColor: "white",
+      backgroundColor: "rgba(255, 255, 255, 0.9)",
       borderRadius: "50%",
       border: "none",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
       cursor: "pointer",
+      transition: "all 0.2s ease",
+      color: "#ef4444",
+    },
+    heartButtonHover: {
+      backgroundColor: "white",
+      transform: "scale(1.1)",
     },
     cardContent: {
-      padding: "16px",
+      padding: "20px",
     },
     cardTitle: {
-      fontWeight: "600",
+      fontWeight: "700",
       color: "#111827",
-      marginBottom: "4px",
+      marginBottom: "8px",
+      fontSize: "18px",
+      lineHeight: "1.3",
+      display: "-webkit-box",
+      WebkitLineClamp: 2,
+      WebkitBoxOrient: "vertical",
+      overflow: "hidden",
     },
     cardLocation: {
       color: "#6b7280",
       fontSize: "14px",
-      marginBottom: "8px",
+      marginBottom: "12px",
       display: "flex",
       alignItems: "center",
+      fontWeight: "500",
+    },
+    cardDescription: {
+      color: "#9ca3af",
+      fontSize: "13px",
+      marginBottom: "16px",
+      display: "-webkit-box",
+      WebkitLineClamp: 2,
+      WebkitBoxOrient: "vertical",
+      overflow: "hidden",
+      lineHeight: "1.4",
     },
     cardFooter: {
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
+      marginBottom: "16px",
     },
     price: {
-      fontSize: "20px",
-      fontWeight: "bold",
-      color: "#111827",
+      fontSize: "22px",
+      fontWeight: "800",
+      color: "#059669",
+      display: "flex",
+      flexDirection: "column",
+    },
+    priceLabel: {
+      fontSize: "11px",
+      fontWeight: "500",
+      color: "#6b7280",
+      textTransform: "uppercase",
     },
     typeTag: {
-      fontSize: "12px",
-      color: "#6b7280",
+      fontSize: "11px",
+      color: "#374151",
       backgroundColor: "#f3f4f6",
-      padding: "4px 8px",
-      borderRadius: "4px",
+      padding: "6px 10px",
+      borderRadius: "20px",
+      fontWeight: "600",
+      border: "1px solid #e5e7eb",
+    },
+    cardActions: {
+      display: "flex",
+      gap: "8px",
+    },
+    cardViewButton: {
+      flex: 1,
+      backgroundColor: "#2563eb",
+      color: "white",
+      padding: "10px 16px",
+      borderRadius: "8px",
+      border: "none",
+      fontSize: "14px",
+      fontWeight: "600",
+      cursor: "pointer",
+      transition: "all 0.2s ease",
+    },
+    contactButton: {
+      backgroundColor: "#f8fafc",
+      color: "#374151",
+      padding: "10px 16px",
+      borderRadius: "8px",
+      border: "1px solid #d1d5db",
+      fontSize: "14px",
+      fontWeight: "600",
+      cursor: "pointer",
+      transition: "all 0.2s ease",
     },
     pagination: {
       display: "flex",
@@ -363,23 +528,27 @@ const PropertyListing = () => {
       <header style={styles.header}>
         <div style={styles.headerContent}>
           <div style={styles.leftHeader}>
-            <div style={styles.logo}>GharBazaar</div>
+            <div style={styles.logo} onClick={handleGoHome}>
+              GharBazaar
+            </div>
             <nav style={styles.nav}>
-              <a href="#" style={styles.navLink}>
+              <span style={styles.navLink} onClick={() => setPurpose("rent")}>
                 Rent
-              </a>
-              <a href="#" style={styles.navLinkInactive}>
+              </span>
+              <span
+                style={
+                  purpose === "sell" ? styles.navLink : styles.navLinkInactive
+                }
+                onClick={() => setPurpose("sell")}
+              >
                 Buy
-              </a>
-              <a href="#" style={styles.navLinkInactive}>
+              </span>
+              <span style={styles.navLinkInactive} onClick={handleAddProperty}>
                 Sell
-              </a>
-              <a href="#" style={styles.navLinkInactive}>
+              </span>
+              <span style={styles.navLinkInactive} onClick={handleAddProperty}>
                 Manage Property
-              </a>
-              <a href="#" style={styles.navLinkInactive}>
-                Resources
-              </a>
+              </span>
             </nav>
           </div>
           <div style={styles.rightHeader}>
@@ -387,12 +556,16 @@ const PropertyListing = () => {
               <span style={styles.searchIcon}>🔍</span>
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="Search properties..."
                 style={styles.searchInput}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button style={styles.postButton}>Post Property</button>
-            <div style={styles.userIcon}>
+            <button style={styles.postButton} onClick={handleAddProperty}>
+              Post Property
+            </button>
+            <div style={styles.userIcon} onClick={() => navigate("/dashboard")}>
               <span>👤</span>
             </div>
           </div>
@@ -402,66 +575,280 @@ const PropertyListing = () => {
       <div style={styles.mainContent}>
         {/* Sidebar Filters */}
         <div style={styles.sidebar}>
-          <h3 style={styles.sidebarTitle}>Filters</h3>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <h3 style={styles.sidebarTitle}>Filters</h3>
+            <button
+              onClick={resetFilters}
+              style={{
+                backgroundColor: "transparent",
+                color: "#6b7280",
+                border: "1px solid #d1d5db",
+                padding: "6px 12px",
+                borderRadius: "6px",
+                fontSize: "12px",
+                cursor: "pointer",
+                fontWeight: "500",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#f9fafb";
+                e.target.style.borderColor = "#9ca3af";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+                e.target.style.borderColor = "#d1d5db";
+              }}
+            >
+              Reset All
+            </button>
+          </div>
 
           {/* Price Range */}
           <div style={styles.filterSection}>
-            <label style={styles.filterLabel}>Price range</label>
-            <div style={styles.priceInputs}>
-              <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) => handlePriceChange(0, e.target.value)}
-                style={styles.priceInput}
-                placeholder="Min"
-              />
-              <input
-                type="range"
-                min="0"
-                max="50000"
-                value={priceRange[1]}
-                onChange={(e) => handlePriceChange(1, e.target.value)}
-                style={styles.rangeSlider}
-              />
-              <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) => handlePriceChange(1, e.target.value)}
-                style={styles.priceInput}
-                placeholder="Max"
-              />
+            <label style={styles.filterLabel}>Price Range (NPR)</label>
+            <div
+              style={{
+                backgroundColor: "#f8fafc",
+                padding: "16px",
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                marginBottom: "12px",
+              }}
+            >
+              <div style={styles.priceInputs}>
+                <div style={{ flex: 1 }}>
+                  <label
+                    style={{
+                      fontSize: "11px",
+                      color: "#6b7280",
+                      marginBottom: "4px",
+                      display: "block",
+                    }}
+                  >
+                    Min
+                  </label>
+                  <input
+                    type="number"
+                    value={priceRange[0]}
+                    onChange={(e) => handlePriceChange(0, e.target.value)}
+                    style={{
+                      ...styles.priceInput,
+                      width: "100%",
+                      padding: "8px 12px",
+                    }}
+                    placeholder="0"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label
+                    style={{
+                      fontSize: "11px",
+                      color: "#6b7280",
+                      marginBottom: "4px",
+                      display: "block",
+                    }}
+                  >
+                    Max
+                  </label>
+                  <input
+                    type="number"
+                    value={priceRange[1]}
+                    onChange={(e) => handlePriceChange(1, e.target.value)}
+                    style={{
+                      ...styles.priceInput,
+                      width: "100%",
+                      padding: "8px 12px",
+                    }}
+                    placeholder="100000"
+                  />
+                </div>
+              </div>
+              <div style={{ marginTop: "12px" }}>
+                <input
+                  type="range"
+                  min="0"
+                  max="100000"
+                  value={priceRange[1]}
+                  onChange={(e) => handlePriceChange(1, e.target.value)}
+                  style={{
+                    ...styles.rangeSlider,
+                    width: "100%",
+                  }}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: "11px",
+                    color: "#9ca3af",
+                    marginTop: "4px",
+                  }}
+                >
+                  <span>₹0</span>
+                  <span>₹1L+</span>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Property Type */}
           <div style={styles.filterSection}>
             <label style={styles.filterLabel}>Property Type</label>
-            <div style={styles.propertyTypeGrid}>
-              {["Apartment", "House", "Condo", "Townhouse"].map((type) => (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "8px",
+              }}
+            >
+              <button
+                onClick={() => setPropertyType("")}
+                style={
+                  propertyType === ""
+                    ? {
+                        ...styles.typeButtonActive,
+                        position: "relative",
+                        overflow: "hidden",
+                      }
+                    : styles.typeButton
+                }
+              >
+                All Types
+              </button>
+              {["house", "flat", "room", "land"].map((type) => (
                 <button
                   key={type}
                   onClick={() => setPropertyType(type)}
                   style={
                     propertyType === type
-                      ? styles.typeButtonActive
+                      ? {
+                          ...styles.typeButtonActive,
+                          position: "relative",
+                          overflow: "hidden",
+                        }
                       : styles.typeButton
                   }
+                  onMouseEnter={(e) => {
+                    if (propertyType !== type) {
+                      e.target.style.backgroundColor = "#f8fafc";
+                      e.target.style.borderColor = "#9ca3af";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (propertyType !== type) {
+                      e.target.style.backgroundColor = "white";
+                      e.target.style.borderColor = "#d1d5db";
+                    }
+                  }}
                 >
-                  {type}
+                  {type === "flat"
+                    ? "🏢"
+                    : type === "house"
+                    ? "🏠"
+                    : type === "room"
+                    ? "🚪"
+                    : "🌍"}{" "}
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Distance */}
+          {/* Purpose */}
           <div style={styles.filterSection}>
-            <label style={styles.filterLabel}>Distance</label>
-            <select style={styles.select}>
-              <option>Any</option>
-              <option>Within 1 km</option>
-              <option>Within 5 km</option>
-              <option>Within 10 km</option>
-            </select>
+            <label style={styles.filterLabel}>Listing Purpose</label>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: "8px",
+              }}
+            >
+              <button
+                onClick={() => setPurpose("")}
+                style={
+                  purpose === "" ? styles.typeButtonActive : styles.typeButton
+                }
+              >
+                🔍 All Purposes
+              </button>
+              <button
+                onClick={() => setPurpose("rent")}
+                style={
+                  purpose === "rent"
+                    ? styles.typeButtonActive
+                    : styles.typeButton
+                }
+              >
+                🏠 For Rent
+              </button>
+              <button
+                onClick={() => setPurpose("sell")}
+                style={
+                  purpose === "sell"
+                    ? styles.typeButtonActive
+                    : styles.typeButton
+                }
+              >
+                💰 For Sale
+              </button>
+              <button
+                onClick={() => setPurpose("buy")}
+                style={
+                  purpose === "buy"
+                    ? styles.typeButtonActive
+                    : styles.typeButton
+                }
+              >
+                🛒 Wanted to Buy
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div
+            style={{
+              backgroundColor: "#f0f9ff",
+              padding: "16px",
+              borderRadius: "8px",
+              border: "1px solid #e0f2fe",
+              marginTop: "20px",
+            }}
+          >
+            <h4
+              style={{
+                fontSize: "14px",
+                fontWeight: "600",
+                color: "#0369a1",
+                marginBottom: "8px",
+              }}
+            >
+              Search Results
+            </h4>
+            <p
+              style={{
+                fontSize: "24px",
+                fontWeight: "800",
+                color: "#0c4a6e",
+                marginBottom: "4px",
+              }}
+            >
+              {totalProperties}
+            </p>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#0369a1",
+              }}
+            >
+              Properties found
+            </p>
           </div>
         </div>
 
@@ -473,9 +860,11 @@ const PropertyListing = () => {
               <div style={styles.titleLeft}>
                 <h1 style={styles.mainTitle}>
                   <span style={styles.locationIcon}>📍</span>
-                  Kathmandu, Nepal
+                  Nepal Properties
                 </h1>
-                <p style={styles.subtitle}>225 properties found</p>
+                <p style={styles.subtitle}>
+                  {totalProperties} properties found
+                </p>
               </div>
               <div style={styles.viewToggle}>
                 <button
@@ -502,50 +891,217 @@ const PropertyListing = () => {
             </div>
           </div>
 
-          {/* Property Grid */}
-          <div style={styles.propertyGrid}>
-            {properties.map((property) => (
-              <div key={property.id} style={styles.propertyCard}>
-                <div style={styles.imageContainer}>
-                  <img
-                    src={property.image}
-                    alt={property.title}
-                    style={styles.propertyImage}
-                  />
-                  <button style={styles.heartButton}>
-                    <span>♡</span>
-                  </button>
-                </div>
-                <div style={styles.cardContent}>
-                  <h3 style={styles.cardTitle}>{property.title}</h3>
-                  <p style={styles.cardLocation}>
-                    <span style={{ marginRight: "4px" }}>📍</span>
-                    {property.location}
-                  </p>
-                  <div style={styles.cardFooter}>
-                    <span style={styles.price}>
-                      Rs {property.price.toLocaleString()}/month
-                    </span>
-                    <span style={styles.typeTag}>{property.type}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Error Message */}
+          {error && (
+            <div
+              style={{
+                backgroundColor: "#fee2e2",
+                color: "#dc2626",
+                padding: "12px 16px",
+                borderRadius: "8px",
+                marginBottom: "16px",
+                fontSize: "14px",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </div>
+          )}
 
-          {/* Pagination */}
-          <div style={styles.pagination}>
-            {[1, 2, 3, 4, 5].map((page) => (
+          {/* Loading State */}
+          {loading ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "400px",
+                fontSize: "18px",
+                color: "#6b7280",
+              }}
+            >
+              Loading properties...
+            </div>
+          ) : filteredProperties.length === 0 ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "400px",
+                textAlign: "center",
+                color: "#6b7280",
+              }}
+            >
+              <h3>No properties found</h3>
+              <p>Try adjusting your filters or search criteria</p>
               <button
-                key={page}
-                style={page === 1 ? styles.pageButtonActive : styles.pageButton}
+                onClick={handleAddProperty}
+                style={{
+                  ...styles.postButton,
+                  marginTop: "16px",
+                  padding: "12px 24px",
+                }}
               >
-                {page}
+                Add First Property
               </button>
-            ))}
-            <span style={{ padding: "0 8px", color: "#6b7280" }}>...</span>
-            <button style={styles.pageButton}>9</button>
-          </div>
+            </div>
+          ) : (
+            /* Property Grid */
+            <div style={styles.propertyGrid}>
+              {filteredProperties.map((property) => {
+                let images = [];
+                try {
+                  images = property.images ? JSON.parse(property.images) : [];
+                } catch (error) {
+                  console.error("Error parsing images JSON:", error);
+                  images = [];
+                }
+                const firstImage = images.length > 0 ? images[0] : null;
+
+                return (
+                  <div
+                    key={property.id}
+                    style={styles.propertyCard}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 8px 25px rgba(0, 0, 0, 0.15)";
+                      const image = e.currentTarget.querySelector("img");
+                      if (image) image.style.transform = "scale(1.05)";
+                      const overlay =
+                        e.currentTarget.querySelector(".image-overlay");
+                      if (overlay) overlay.style.opacity = "1";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow =
+                        "0 2px 8px rgba(0, 0, 0, 0.1)";
+                      const image = e.currentTarget.querySelector("img");
+                      if (image) image.style.transform = "scale(1)";
+                      const overlay =
+                        e.currentTarget.querySelector(".image-overlay");
+                      if (overlay) overlay.style.opacity = "0";
+                    }}
+                  >
+                    <div style={styles.imageContainer}>
+                      {firstImage ? (
+                        <img
+                          src={`${url.replace(/\/$/, "")}${firstImage}`}
+                          alt={property.title}
+                          style={styles.propertyImage}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "flex";
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        style={{
+                          ...styles.propertyImage,
+                          display: firstImage ? "none" : "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f3f4f6",
+                          color: "#9ca3af",
+                          fontSize: "14px",
+                        }}
+                      >
+                        📷 No Image Available
+                      </div>
+                      <div
+                        className="image-overlay"
+                        style={styles.imageOverlay}
+                      ></div>
+                      <div style={styles.propertyBadge}>{property.purpose}</div>
+                      <button
+                        style={styles.heartButton}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFavorite(property.id);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = "white";
+                          e.target.style.transform = "scale(1.1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor =
+                            "rgba(255, 255, 255, 0.9)";
+                          e.target.style.transform = "scale(1)";
+                        }}
+                      >
+                        <span>♡</span>
+                      </button>
+                    </div>
+                    <div style={styles.cardContent}>
+                      <h3 style={styles.cardTitle}>{property.title}</h3>
+                      <p style={styles.cardLocation}>
+                        <span style={{ marginRight: "6px" }}>📍</span>
+                        {property.location}
+                      </p>
+                      {property.description && (
+                        <p style={styles.cardDescription}>
+                          {property.description}
+                        </p>
+                      )}
+                      <div style={styles.cardFooter}>
+                        <div style={styles.price}>
+                          <span style={styles.priceLabel}>
+                            {property.purpose === "rent"
+                              ? "Monthly Rent"
+                              : "Price"}
+                          </span>
+                          Rs {parseInt(property.price).toLocaleString()}
+                          {property.purpose === "rent" ? "/mo" : ""}
+                        </div>
+                        <span style={styles.typeTag}>
+                          {property.property_type?.charAt(0).toUpperCase() +
+                            property.property_type?.slice(1)}
+                        </span>
+                      </div>
+                      <div style={styles.cardActions}>
+                        <button
+                          style={styles.cardViewButton}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewListing(property.id);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#1d4ed8";
+                            e.target.style.transform = "translateY(-1px)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "#2563eb";
+                            e.target.style.transform = "translateY(0)";
+                          }}
+                        >
+                          View Details
+                        </button>
+                        <button
+                          style={styles.contactButton}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Implement contact functionality
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = "#f1f5f9";
+                            e.target.style.borderColor = "#94a3b8";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = "#f8fafc";
+                            e.target.style.borderColor = "#d1d5db";
+                          }}
+                        >
+                          Contact
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

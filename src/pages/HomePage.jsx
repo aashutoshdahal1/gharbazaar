@@ -573,6 +573,7 @@ export default function GharBazaarHomepage() {
                   style={styles.navLink}
                   onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
                   onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                  onClick={() => navigate("/filter")}
                 >
                   Properties
                 </span>
