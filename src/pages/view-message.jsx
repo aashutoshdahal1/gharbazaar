@@ -108,7 +108,7 @@ const ViewMessages = () => {
     // navigate(`/listing/${listingId}`);
   };
 
-  const styles = {
+  return (
     container: {
       minHeight: '100vh',
       backgroundColor: '#f8fafc',
@@ -264,87 +264,71 @@ const ViewMessages = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.maxWidth}>
+    <div className="message-container">
+      <div className="container-max-width">
         {/* Header */}
-        <div style={styles.header}>
-          <h1 style={styles.title}>Inbox</h1>
+        <div className="message-header">
+          <h1 className="card-title">Inbox</h1>
         </div>
 
         {/* Search Bar */}
-        <div style={styles.searchContainer}>
-          <span style={styles.searchIcon}>🔍</span>
+        <div className="search-container">
+          <span className="search-icon">🔍</span>
           <input
             type="text"
             placeholder="Search messages"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={styles.searchInput}
-            onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-            onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+            className="search-input"
           />
         </div>
 
         {/* All Messages Text */}
-        <div style={styles.allMessages}>
+        <div className="all-messages-label">
           All Messages
         </div>
 
         {/* Messages Table */}
-        <div style={styles.tableContainer}>
-          <div style={styles.tableHeader}>
-            <div style={styles.headerCell}>Sender</div>
-            <div style={styles.headerCell}>Subject</div>
-            <div style={styles.headerCell}>Date</div>
-            <div style={styles.headerCell}>Action</div>
+        <div className="table-container">
+          <div className="table-header">
+            <div className="header-cell">Sender</div>
+            <div className="header-cell">Subject</div>
+            <div className="header-cell">Date</div>
+            <div className="header-cell">Action</div>
           </div>
 
           {filteredMessages.map((message) => (
             <div
               key={message.id}
-              style={{
-                ...styles.messageRow,
-                ...(message.isRead ? {} : styles.unreadRow)
-              }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = message.isRead ? 'white' : '#eff6ff'}
+              className={`message-row ${!message.isRead ? 'unread-row' : ''}`}
             >
-              <div style={styles.senderCell}>
-                <div style={styles.avatar}>
+              <div className="sender-cell">
+                <div className="avatar">
                   <span>👤</span>
                 </div>
-                <span style={{
-                  ...styles.senderName,
-                  ...(message.isRead ? {} : styles.boldText)
-                }}>
+                <span className={`sender-name ${!message.isRead ? 'bold-text' : ''}`}>
                   {message.sender}
                 </span>
               </div>
               
-              <div style={styles.subjectCell}>
-                {!message.isRead && <div style={styles.unreadDot}></div>}
+              <div className="sender-cell">
                 <span>✉️</span>
-                <span style={{
-                  ...styles.subjectText,
-                  ...(message.isRead ? {} : styles.boldText)
-                }}>
+                <span className={`sender-name ${!message.isRead ? 'bold-text' : ''}`}>
                   {message.subject}
                 </span>
               </div>
               
-              <div style={styles.dateCell}>
+              <div className="message-date">
                 <span>📅</span>
-                <span style={styles.dateText}>
+                <span>
                   {formatDate(message.date)}
                 </span>
               </div>
 
-              <div style={styles.actionCell}>
+              <div>
                 <button
                   onClick={() => handleViewListing(message.listingId)}
-                  style={styles.viewButton}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+                  className="action-button"
                 >
                   <span>View Listing</span>
                   <span>🔗</span>
@@ -355,7 +339,7 @@ const ViewMessages = () => {
         </div>
 
         {/* Message Count */}
-        <div style={styles.messageCount}>
+        <div className="text-secondary mt-3">
           Showing {filteredMessages.length} of {messages.length} messages
         </div>
       </div>

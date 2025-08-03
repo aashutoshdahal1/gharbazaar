@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./styles/global.css";
 import HomePage from "./pages/HomePage";
 import GharBazaarAuth from "./pages/Login_Signup";
 import FilterPage from "./pages/FilterPage";
@@ -12,7 +13,7 @@ import AddProperty from "./pages/AddProperty";
 import EditProperty from "./pages/EditProperty";
 import EditProfile from "./pages/EditProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ViewMessages from "./pages/view-message"; // Updated import path to match your file name
+import ViewMessages from "./pages/ViewMessages"; // Updated import path
 
 function App() {
   return (

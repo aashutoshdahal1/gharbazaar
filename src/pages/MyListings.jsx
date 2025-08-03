@@ -72,175 +72,26 @@ const MyListings = () => {
     }
   };
 
-  const styles = {
-    container: {
-      fontFamily: "'Plus Jakarta Sans', 'Noto Sans', sans-serif",
-      minHeight: "100vh",
-      backgroundColor: "#f8fafc",
-      padding: "40px",
-    },
-    header: {
-      backgroundColor: "white",
-      borderRadius: "12px",
-      padding: "32px",
-      marginBottom: "24px",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    },
-    title: {
-      fontSize: "28px",
-      fontWeight: "bold",
-      color: "#121516",
-      marginBottom: "8px",
-    },
-    subtitle: {
-      fontSize: "16px",
-      color: "#6b7280",
-    },
-    backButton: {
-      backgroundColor: "#b2d1e5",
-      color: "#121516",
-      border: "none",
-      borderRadius: "8px",
-      padding: "12px 24px",
-      fontSize: "14px",
-      fontWeight: "600",
-      cursor: "pointer",
-      marginBottom: "20px",
-    },
-    emptyState: {
-      backgroundColor: "white",
-      borderRadius: "12px",
-      padding: "48px",
-      textAlign: "center",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-    },
-    emptyText: {
-      fontSize: "18px",
-      color: "#6b7280",
-      marginBottom: "16px",
-    },
-    addButton: {
-      backgroundColor: "#b2d1e5",
-      color: "#121516",
-      border: "none",
-      borderRadius: "8px",
-      padding: "12px 24px",
-      fontSize: "16px",
-      fontWeight: "600",
-      cursor: "pointer",
-    },
-    listingsGrid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-      gap: "20px",
-      marginTop: "20px",
-    },
-    listingCard: {
-      backgroundColor: "white",
-      borderRadius: "12px",
-      padding: "20px",
-      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-      border: "1px solid #e5e7eb",
-      overflow: "hidden",
-    },
-    listingImage: {
-      width: "100%",
-      height: "200px",
-      objectFit: "cover",
-      borderRadius: "8px",
-      marginBottom: "12px",
-    },
-    noImage: {
-      width: "100%",
-      height: "200px",
-      backgroundColor: "#f3f4f6",
-      borderRadius: "8px",
-      marginBottom: "12px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "#6b7280",
-      fontSize: "14px",
-    },
-    listingTitle: {
-      fontSize: "18px",
-      fontWeight: "bold",
-      color: "#121516",
-      marginBottom: "8px",
-    },
-    listingDetails: {
-      fontSize: "14px",
-      color: "#6b7280",
-      marginBottom: "4px",
-    },
-    listingPrice: {
-      fontSize: "16px",
-      fontWeight: "600",
-      color: "#10b981",
-      marginBottom: "12px",
-    },
-    listingActions: {
-      display: "flex",
-      gap: "8px",
-      marginTop: "12px",
-    },
-    editButton: {
-      backgroundColor: "#3b82f6",
-      color: "white",
-      border: "none",
-      borderRadius: "6px",
-      padding: "6px 12px",
-      fontSize: "12px",
-      fontWeight: "500",
-      cursor: "pointer",
-    },
-    deleteButton: {
-      backgroundColor: "#ef4444",
-      color: "white",
-      border: "none",
-      borderRadius: "6px",
-      padding: "6px 12px",
-      fontSize: "12px",
-      fontWeight: "500",
-      cursor: "pointer",
-    },
-    errorMessage: {
-      backgroundColor: "#fee2e2",
-      color: "#dc2626",
-      padding: "12px 16px",
-      borderRadius: "8px",
-      margin: "16px 0",
-      fontSize: "14px",
-      textAlign: "center",
-    },
-    loadingContainer: {
-      textAlign: "center",
-      padding: "40px",
-      fontSize: "16px",
-      color: "#6b7280",
-    },
-  };
-
   return (
-    <div style={styles.container}>
-      <button style={styles.backButton} onClick={() => navigate("/dashboard")}>
+    <div className="page-container">
+      <button className="nav-back" onClick={() => navigate("/dashboard")}>
         ← Back to Dashboard
       </button>
 
-      <div style={styles.header}>
-        <h1 style={styles.title}>My Listings</h1>
-        <p style={styles.subtitle}>Manage your property listings</p>
+      <div className="card-header">
+        <h1 className="card-title">My Listings</h1>
+        <p className="card-subtitle">Manage your property listings</p>
       </div>
 
-      {error && <div style={styles.errorMessage}>{error}</div>}
+      {error && <div className="alert alert-error">{error}</div>}
 
       {loading ? (
-        <div style={styles.loadingContainer}>Loading your listings...</div>
+        <div className="loading-container">Loading your listings...</div>
       ) : listings.length === 0 ? (
-        <div style={styles.emptyState}>
-          <p style={styles.emptyText}>You haven't created any listings yet.</p>
+        <div className="empty-state">
+          <p className="empty-text">You haven't created any listings yet.</p>
           <button
-            style={styles.addButton}
+            className="btn btn-primary"
             onClick={() => navigate("/add-listing")}
           >
             Create Your First Listing
@@ -248,26 +99,26 @@ const MyListings = () => {
         </div>
       ) : (
         <>
-          <div style={{ textAlign: "right", marginBottom: "20px" }}>
+          <div className="text-right mb-3">
             <button
-              style={styles.addButton}
+              className="btn btn-primary"
               onClick={() => navigate("/add-listing")}
             >
               + Add New Listing
             </button>
           </div>
-          <div style={styles.listingsGrid}>
+          <div className="listings-grid">
             {listings.map((listing) => {
               const images = listing.images ? JSON.parse(listing.images) : [];
               const firstImage = images.length > 0 ? images[0] : null;
 
               return (
-                <div key={listing.id} style={styles.listingCard}>
+                <div key={listing.id} className="listing-card">
                   {firstImage ? (
                     <img
                       src={`http://localhost:5001${firstImage}`}
                       alt={listing.title}
-                      style={styles.listingImage}
+                      className="listing-image"
                       onError={(e) => {
                         e.target.style.display = "none";
                         e.target.nextSibling.style.display = "flex";
@@ -275,54 +126,47 @@ const MyListings = () => {
                     />
                   ) : null}
                   <div
+                    className="listing-no-image"
                     style={{
-                      ...styles.noImage,
                       display: firstImage ? "none" : "flex",
                     }}
                   >
                     No Image Available
                   </div>
 
-                  <h3 style={styles.listingTitle}>{listing.title}</h3>
-                  <p style={styles.listingDetails}>
+                  <h3 className="listing-title">{listing.title}</h3>
+                  <p className="listing-details">
                     <strong>Type:</strong> {listing.property_type}
                   </p>
-                  <p style={styles.listingDetails}>
+                  <p className="listing-details">
                     <strong>Location:</strong> {listing.location}
                   </p>
-                  <p style={styles.listingDetails}>
+                  <p className="listing-details">
                     <strong>Purpose:</strong> {listing.purpose}
                   </p>
                   {listing.area && (
-                    <p style={styles.listingDetails}>
+                    <p className="listing-details">
                       <strong>Area:</strong> {listing.area}
                     </p>
                   )}
                   {listing.description && (
-                    <p
-                      style={{
-                        ...styles.listingDetails,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <p className="listing-details text-ellipsis">
                       <strong>Description:</strong> {listing.description}
                     </p>
                   )}
-                  <p style={styles.listingPrice}>
+                  <p className="listing-price">
                     Rs. {parseInt(listing.price).toLocaleString()}
                     {listing.purpose === "rent" ? "/month" : ""}
                   </p>
-                  <div style={styles.listingActions}>
+                  <div className="listing-actions">
                     <button
-                      style={styles.editButton}
+                      className="btn-edit"
                       onClick={() => navigate(`/edit-listing/${listing.id}`)}
                     >
                       Edit
                     </button>
                     <button
-                      style={styles.deleteButton}
+                      className="btn-delete"
                       onClick={() => handleDeleteListing(listing.id)}
                     >
                       Delete
