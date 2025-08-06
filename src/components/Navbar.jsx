@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const Navbar = ({
   showDashboardButton = false,
+  showViewDashboardButton = false,
   showBackButton = false,
   backButtonText = "← Back",
   backButtonAction = null,
@@ -113,6 +114,26 @@ const Navbar = ({
               onClick={handleBackClick}
             >
               {backButtonText}
+            </button>
+          )}
+          {showViewDashboardButton && (
+            <button
+              style={{
+                backgroundColor: "#1e40af",
+                color: "white",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                border: "none",
+                fontSize: "14px",
+                fontWeight: "500",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onClick={() => navigate("/dashboard")}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#1d4ed8")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#1e40af")}
+            >
+              View Dashboard
             </button>
           )}
           {showDashboardButton && (

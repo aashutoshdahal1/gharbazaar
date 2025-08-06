@@ -327,25 +327,67 @@ const PropertyListing = () => {
       gap: "8px",
     },
     viewButton: {
-      padding: "8px",
-      borderRadius: "4px",
-      border: "none",
-      backgroundColor: "transparent",
+      padding: "8px 16px",
+      borderRadius: "6px",
+      border: "1px solid #d1d5db",
+      backgroundColor: "white",
       cursor: "pointer",
-      color: "#9ca3af",
+      color: "#6b7280",
+      fontSize: "14px",
+      fontWeight: "500",
+      transition: "all 0.2s ease",
     },
     viewButtonActive: {
-      padding: "8px",
-      borderRadius: "4px",
-      border: "none",
-      backgroundColor: "#dbeafe",
-      color: "#2563eb",
+      padding: "8px 16px",
+      borderRadius: "6px",
+      border: "1px solid #2563eb",
+      backgroundColor: "#2563eb",
+      color: "white",
       cursor: "pointer",
+      fontSize: "14px",
+      fontWeight: "500",
+      transition: "all 0.2s ease",
     },
     propertyGrid: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
       gap: "24px",
+    },
+    propertyList: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "16px",
+    },
+    propertyListCard: {
+      backgroundColor: "white",
+      borderRadius: "12px",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+      overflow: "hidden",
+      transition: "all 0.3s ease",
+      cursor: "pointer",
+      border: "1px solid #e5e7eb",
+      display: "flex",
+      height: "200px",
+    },
+    listImageContainer: {
+      width: "280px",
+      height: "200px",
+      position: "relative",
+      overflow: "hidden",
+      flexShrink: 0,
+    },
+    listPropertyImage: {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      transition: "transform 0.3s ease",
+    },
+    listCardContent: {
+      flex: 1,
+      padding: "20px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
     },
     propertyCard: {
       backgroundColor: "white",
@@ -526,7 +568,7 @@ const PropertyListing = () => {
   return (
     <div style={styles.container}>
       {/* Header */}
-      <Navbar />
+      <Navbar showViewDashboardButton={true} />
 
       <div style={styles.mainContent}>
         {/* Sidebar Filters */}
@@ -830,8 +872,20 @@ const PropertyListing = () => {
                       ? styles.viewButtonActive
                       : styles.viewButton
                   }
+                  onMouseEnter={(e) => {
+                    if (viewMode !== "list") {
+                      e.target.style.backgroundColor = "#f8fafc";
+                      e.target.style.borderColor = "#9ca3af";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (viewMode !== "list") {
+                      e.target.style.backgroundColor = "white";
+                      e.target.style.borderColor = "#d1d5db";
+                    }
+                  }}
                 >
-                  <span>☰</span>
+                  <span>List</span>
                 </button>
                 <button
                   onClick={() => setViewMode("grid")}
@@ -840,8 +894,20 @@ const PropertyListing = () => {
                       ? styles.viewButtonActive
                       : styles.viewButton
                   }
+                  onMouseEnter={(e) => {
+                    if (viewMode !== "grid") {
+                      e.target.style.backgroundColor = "#f8fafc";
+                      e.target.style.borderColor = "#9ca3af";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (viewMode !== "grid") {
+                      e.target.style.backgroundColor = "white";
+                      e.target.style.borderColor = "#d1d5db";
+                    }
+                  }}
                 >
-                  <span>⊞</span>
+                  <span>Grid</span>
                 </button>
               </div>
             </div>
@@ -904,8 +970,12 @@ const PropertyListing = () => {
               </button>
             </div>
           ) : (
-            /* Property Grid */
-            <div style={styles.propertyGrid}>
+            /* Property Grid/List */
+            <div
+              style={
+                viewMode === "grid" ? styles.propertyGrid : styles.propertyList
+              }
+            >
               {filteredProperties.map((property) => {
                 let images = [];
                 let coverImage = null;
@@ -922,6 +992,141 @@ const PropertyListing = () => {
                   console.error("Error parsing images JSON:", error);
                   images = [];
                 }
+
+                if (viewMode === "list") {
+                  // List View
+                  return (
+                    <div
+                      key={property.id}
+                      style={styles.propertyListCard}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 15px rgba(0, 0, 0, 0.12)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow =
+                          "0 2px 8px rgba(0, 0, 0, 0.1)";
+                      }}
+                    >
+                      <div style={styles.listImageContainer}>
+                        {coverImage ? (
+                          <img
+                            src={`${url.replace(/\/$/, "")}${coverImage.url}`}
+                            alt={property.title}
+                            style={styles.listPropertyImage}
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                              e.target.nextSibling.style.display = "flex";
+                            }}
+                          />
+                        ) : null}
+                        <div
+                          style={{
+                            ...styles.listPropertyImage,
+                            display: coverImage ? "none" : "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#f3f4f6",
+                            color: "#9ca3af",
+                            fontSize: "14px",
+                          }}
+                        >
+                          📷 No Image Available
+                        </div>
+                        <div
+                          style={{
+                            ...styles.propertyBadge,
+                            position: "absolute",
+                            top: "12px",
+                            left: "12px",
+                          }}
+                        >
+                          {property.purpose}
+                        </div>
+                      </div>
+                      <div style={styles.listCardContent}>
+                        <div>
+                          <h3
+                            style={{ ...styles.cardTitle, marginBottom: "8px" }}
+                          >
+                            {property.title}
+                          </h3>
+                          <p
+                            style={{
+                              ...styles.cardLocation,
+                              marginBottom: "8px",
+                            }}
+                          >
+                            <span style={{ marginRight: "6px" }}>📍</span>
+                            {property.location}
+                          </p>
+                          {property.description && (
+                            <p
+                              style={{
+                                ...styles.cardDescription,
+                                WebkitLineClamp: 2,
+                              }}
+                            >
+                              {property.description}
+                            </p>
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div style={styles.price}>
+                            <span style={styles.priceLabel}>
+                              {property.purpose === "rent"
+                                ? "Monthly Rent"
+                                : "Price"}
+                            </span>
+                            Rs {parseInt(property.price).toLocaleString()}
+                            {property.purpose === "rent" ? "/mo" : ""}
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "8px",
+                              alignItems: "center",
+                            }}
+                          >
+                            <span style={styles.typeTag}>
+                              {property.property_type?.charAt(0).toUpperCase() +
+                                property.property_type?.slice(1)}
+                            </span>
+                            <button
+                              style={{
+                                ...styles.cardViewButton,
+                                width: "auto",
+                                padding: "8px 16px",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewListing(property.id);
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = "#1d4ed8";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = "#2563eb";
+                              }}
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Grid View (existing code)
 
                 return (
                   <div
