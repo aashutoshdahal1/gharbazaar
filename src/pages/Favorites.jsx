@@ -1,14 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 const Favorites = () => {
   const navigate = useNavigate();
 
   return (
     <div className="page-container">
-      <button className="nav-back" onClick={() => navigate("/dashboard")}>
-        ← Back to Dashboard
-      </button>
+      <Navbar showDashboardButton={true} />
 
       <div className="card-header">
         <h1 className="card-title">Favorite Properties</h1>

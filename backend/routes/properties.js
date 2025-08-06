@@ -10,7 +10,8 @@ const router = express.Router();
 // Get all properties
 router.get("/", async (req, res) => {
   try {
-    const [properties] = await pool.execute(`
+    const { limit } = req.query;
+    let query = `
       SELECT 
         l.*,
         u.name as owner_name,
@@ -18,7 +19,14 @@ router.get("/", async (req, res) => {
       FROM listings l
       LEFT JOIN users u ON l.user_id = u.id
       ORDER BY l.created_at DESC
-    `);
+    `;
+
+    // Add limit if specified
+    if (limit && !isNaN(limit)) {
+      query += ` LIMIT ${parseInt(limit)}`;
+    }
+
+    const [properties] = await pool.execute(query);
 
     res.status(200).json({
       success: true,

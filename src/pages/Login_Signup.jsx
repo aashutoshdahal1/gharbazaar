@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../apiurl";
+import Navbar from "../components/Navbar";
 const GharBazaarAuth = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -305,48 +306,7 @@ const GharBazaarAuth = () => {
   return (
     <div style={styles.designRoot}>
       <div style={styles.layoutContainer}>
-        <header style={styles.header}>
-          <div style={styles.logoContainer}>
-            <div
-              style={styles.logo}
-              onClick={handleLogoClick}
-              onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
-              onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
-            >
-              <svg
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </div>
-            <h2
-              style={{ ...styles.title, cursor: "pointer" }}
-              onClick={handleLogoClick}
-              onMouseEnter={(e) => (e.target.style.transform = "scale(1.02)")}
-              onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
-            >
-              GharBazaar
-            </h2>
-          </div>
-          <div style={styles.navLinks}>
-            <div style={styles.navLinkContainer}>
-              <a style={styles.navLink} href="#">
-                About
-              </a>
-              <a style={styles.navLink} href="#">
-                Contact
-              </a>
-            </div>
-            <button style={styles.listPropertyButton}>
-              <span>List your property</span>
-            </button>
-          </div>
-        </header>
+        <Navbar showHomeAndProperties={false} />
         <div style={styles.mainContent}>
           <div style={styles.contentContainer}>
             <h2 style={styles.heading}>

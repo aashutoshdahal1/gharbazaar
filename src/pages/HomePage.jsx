@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import url from "../apiurl";
+import Navbar from "../components/Navbar";
 
 export default function GharBazaarHomepage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,7 +16,31 @@ export default function GharBazaarHomepage() {
       : false
   );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [recentListings, setRecentListings] = useState([]);
+  const [loadingListings, setLoadingListings] = useState(true);
   const navigate = useNavigate();
+
+  const API_BASE_URL = url + "api";
+
+  const fetchRecentListings = useCallback(async () => {
+    try {
+      setLoadingListings(true);
+      const response = await fetch(`${API_BASE_URL}/properties?limit=4`);
+      const data = await response.json();
+
+      if (data.success) {
+        setRecentListings(data.data || []);
+      } else {
+        console.error("Failed to fetch recent listings:", data.message);
+        setRecentListings([]);
+      }
+    } catch (error) {
+      console.error("Error fetching recent listings:", error);
+      setRecentListings([]);
+    } finally {
+      setLoadingListings(false);
+    }
+  }, [API_BASE_URL]);
 
   // Check for user authentication on component mount
   useEffect(() => {
@@ -32,7 +58,10 @@ export default function GharBazaarHomepage() {
         localStorage.removeItem("user");
       }
     }
-  }, []);
+
+    // Fetch recent listings
+    fetchRecentListings();
+  }, [fetchRecentListings]);
 
   // Handle responsive design
   useEffect(() => {
@@ -85,35 +114,12 @@ export default function GharBazaarHomepage() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const featuredListings = [
-    {
-      id: 1,
-      title: "Cozy Room in Kathmandu",
-      location: "Rs. 15,000/month",
-      type: "Room",
-    },
-    {
-      id: 2,
-      title: "Modern Flat in Pokhara",
-      location: "Rs. 25,000/month",
-      type: "Flat",
-    },
-    {
-      id: 3,
-      title: "Spacious Land in Chitwan",
-      location: "Rs. 50,00,000",
-      type: "Land",
-    },
-    {
-      id: 4,
-      title: "Beautiful House in Lalitpur",
-      location: "Rs. 1,20,00,000",
-      type: "House",
-    },
-  ];
-
   const handleSearch = () => {
-    console.log("Searching for:", searchQuery);
+    if (searchQuery.trim()) {
+      navigate(`/filter?search=${encodeURIComponent(searchQuery)}`);
+    } else {
+      navigate("/filter");
+    }
   };
 
   const styles = {
@@ -385,9 +391,10 @@ export default function GharBazaarHomepage() {
       display: "grid",
       gridTemplateColumns: isMobile
         ? "1fr"
-        : "repeat(auto-fit, minmax(280px, 1fr))",
+        : "repeat(auto-fill, minmax(280px, 1fr))",
       gap: isMobile ? "1rem" : "1.5rem",
       marginBottom: isMobile ? "1rem" : "2rem",
+      maxWidth: "100%",
     },
     card: {
       backgroundColor: "white",
@@ -395,7 +402,10 @@ export default function GharBazaarHomepage() {
       boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
       overflow: "hidden",
       cursor: "pointer",
-      transition: "box-shadow 0.3s",
+      transition: "all 0.3s ease",
+      border: "1px solid #e5e7eb",
+      maxWidth: "400px",
+      margin: "0 auto",
     },
     cardImage: {
       height: isMobile ? "8rem" : "12rem",
@@ -716,7 +726,10 @@ export default function GharBazaarHomepage() {
               </span>
               <span
                 style={styles.mobileNavLink}
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={() => {
+                  navigate("/filter");
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 Properties
               </span>
@@ -843,41 +856,115 @@ export default function GharBazaarHomepage() {
         </div>
       </section>
 
-      {/* Filter Tabs */}
-      <section style={styles.filterTabs}>
-        <div style={styles.filterTabsContent}>
-          {["Room", "Flat", "Land", "House"].map((tab) => (
-            <button key={tab} style={styles.filterTab}>
-              {tab}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Listings */}
+      {/* Recent Listings */}
       <section style={styles.featuredSection}>
         <div style={styles.featuredContent}>
-          <h2 style={styles.featuredTitle}>Featured Listings</h2>
+          <h2 style={styles.featuredTitle}>Recent Listings</h2>
 
-          <div style={styles.grid}>
-            {featuredListings.map((listing) => (
-              <div key={listing.id} style={styles.card}>
-                <div style={styles.cardImage}>
-                  <span>📷 Photo</span>
-                </div>
-                <div style={styles.cardContent}>
-                  <span style={styles.cardType}>{listing.type}</span>
-                  <h3 style={styles.cardTitle}>{listing.title}</h3>
-                  <p style={styles.cardLocation}>{listing.location}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {loadingListings ? (
+            <div
+              style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}
+            >
+              Loading recent listings...
+            </div>
+          ) : recentListings.length > 0 ? (
+            <div style={styles.grid}>
+              {recentListings.map((listing) => {
+                let images = [];
+                let coverImage = null;
+                try {
+                  images = listing.images ? JSON.parse(listing.images) : [];
+                  // Handle new format with cover image info
+                  if (images.length > 0 && typeof images[0] === "object") {
+                    coverImage = images.find((img) => img.isCover) || images[0];
+                  } else if (images.length > 0) {
+                    // Fallback for old format
+                    coverImage = { url: images[0] };
+                  }
+                } catch (error) {
+                  console.error("Error parsing images JSON:", error);
+                  images = [];
+                }
+
+                return (
+                  <div
+                    key={listing.id}
+                    style={styles.card}
+                    onClick={() => navigate(`/property/${listing.id}`)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 10px 25px rgba(0, 0, 0, 0.15)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow =
+                        "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
+                    }}
+                  >
+                    <div style={styles.cardImage}>
+                      {coverImage ? (
+                        <img
+                          src={`${url.replace(/\/$/, "")}${coverImage.url}`}
+                          alt={listing.title}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "flex";
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        style={{
+                          ...styles.cardImage,
+                          display: coverImage ? "none" : "flex",
+                        }}
+                      >
+                        📷 No Image Available
+                      </div>
+                    </div>
+                    <div style={styles.cardContent}>
+                      <span style={styles.cardType}>
+                        {listing.property_type}
+                      </span>
+                      <h3 style={styles.cardTitle}>{listing.title}</h3>
+                      <p style={styles.cardLocation}>
+                        Rs. {parseInt(listing.price).toLocaleString()}
+                        {listing.purpose === "rent" ? "/month" : ""}
+                      </p>
+                      <p
+                        style={{
+                          ...styles.cardLocation,
+                          fontSize: "0.8rem",
+                          marginTop: "0.25rem",
+                        }}
+                      >
+                        📍 {listing.location}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              style={{ textAlign: "center", padding: "2rem", color: "#6b7280" }}
+            >
+              No recent listings available.
+            </div>
+          )}
 
           <div style={styles.viewAllBtn}>
-            <a href="#" style={styles.viewAllLink}>
+            <span
+              style={styles.viewAllLink}
+              onClick={() => navigate("/filter")}
+            >
               View all listings →
-            </a>
+            </span>
           </div>
         </div>
       </section>

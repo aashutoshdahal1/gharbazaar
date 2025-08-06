@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import url from "../apiurl";
+import Navbar from "../components/Navbar";
 
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -284,16 +285,12 @@ const PropertyDetail = () => {
   return (
     <div style={styles.container}>
       {/* Header */}
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <button onClick={() => navigate("/filter")} style={styles.backButton}>
-            ← Back to Properties
-          </button>
-          <div style={styles.logo} onClick={() => navigate("/")}>
-            GharBazaar
-          </div>
-        </div>
-      </header>
+      <Navbar
+        showDashboardButton={true}
+        showBackButton={true}
+        backButtonText="← Back to Properties"
+        backButtonAction={() => navigate("/filter")}
+      />
 
       <div style={styles.mainContent}>
         {/* Image Gallery */}

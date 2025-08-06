@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../apiurl";
+import Navbar from "../components/Navbar";
 const MyListings = () => {
   const navigate = useNavigate();
   const [listings, setListings] = useState([]);
@@ -74,9 +75,8 @@ const MyListings = () => {
 
   return (
     <div className="page-container">
-      <button className="nav-back" onClick={() => navigate("/dashboard")}>
-        ← Back to Dashboard
-      </button>
+      {/* Header */}
+      <Navbar showDashboardButton={true} />
 
       <div className="card-header">
         <h1 className="card-title">My Listings</h1>

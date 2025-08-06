@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../apiurl";
+import Navbar from "../components/Navbar";
 
 const PropertyListing = () => {
   const navigate = useNavigate();
@@ -525,52 +526,7 @@ const PropertyListing = () => {
   return (
     <div style={styles.container}>
       {/* Header */}
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <div style={styles.leftHeader}>
-            <div style={styles.logo} onClick={handleGoHome}>
-              GharBazaar
-            </div>
-            <nav style={styles.nav}>
-              <span style={styles.navLink} onClick={() => setPurpose("rent")}>
-                Rent
-              </span>
-              <span
-                style={
-                  purpose === "sell" ? styles.navLink : styles.navLinkInactive
-                }
-                onClick={() => setPurpose("sell")}
-              >
-                Buy
-              </span>
-              <span style={styles.navLinkInactive} onClick={handleAddProperty}>
-                Sell
-              </span>
-              <span style={styles.navLinkInactive} onClick={handleAddProperty}>
-                Manage Property
-              </span>
-            </nav>
-          </div>
-          <div style={styles.rightHeader}>
-            <div style={styles.searchContainer}>
-              <span style={styles.searchIcon}>🔍</span>
-              <input
-                type="text"
-                placeholder="Search properties..."
-                style={styles.searchInput}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button style={styles.postButton} onClick={handleAddProperty}>
-              Post Property
-            </button>
-            <div style={styles.userIcon} onClick={() => navigate("/dashboard")}>
-              <span>👤</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <div style={styles.mainContent}>
         {/* Sidebar Filters */}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../apiurl"; // Import the API base URL
+import Navbar from "../components/Navbar";
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -192,6 +193,7 @@ const UserDashboard = () => {
       fontWeight: "bold",
       lineHeight: "1.25",
       letterSpacing: "-0.015em",
+      cursor: "pointer",
     },
     navLinks: {
       display: "flex",
@@ -346,19 +348,10 @@ const UserDashboard = () => {
       <div style={styles.layoutContainer}>
         <header style={styles.header}>
           <div style={styles.logoContainer}>
-            <div style={styles.logo}>
-              <svg
-                viewBox="0 0 48 48"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </div>
-            <h2 style={styles.title}>GharBazaar</h2>
+            <div style={styles.logo}>🏠</div>
+            <h2 style={styles.title} onClick={handleHomeClick}>
+              GharBazaar
+            </h2>
           </div>
           <div style={styles.navLinks}>
             <div style={styles.navLinkContainer}>
@@ -373,6 +366,18 @@ const UserDashboard = () => {
                 }
               >
                 Home
+              </span>
+              <span
+                style={styles.navLink}
+                onClick={handleBrowsePropertiesClick}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#f3f4f6")
+                }
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "transparent")
+                }
+              >
+                Properties
               </span>
               <span
                 style={styles.navLink}
