@@ -7,6 +7,7 @@ const EditProfile = () => {
     fullName: "",
     phoneNumber: "",
     email: "",
+    currentPassword: "",
     password: "",
   });
 
@@ -29,6 +30,21 @@ const EditProfile = () => {
     setIsLoading(true);
 
     try {
+      // Validate password fields if user wants to change password
+      if (formData.password && !formData.currentPassword) {
+        alert(
+          "Please enter your current password to change to a new password."
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      if (formData.currentPassword && !formData.password) {
+        alert("Please enter a new password.");
+        setIsLoading(false);
+        return;
+      }
+
       // Add your API call here to save the profile changes
       console.log("Saving profile changes:", formData);
 
@@ -267,10 +283,34 @@ const EditProfile = () => {
               />
             </div>
 
+            {/* Current Password */}
+            <div style={styles.fieldContainer}>
+              <label htmlFor="currentPassword" style={styles.label}>
+                Current Password
+              </label>
+              <input
+                type="password"
+                id="currentPassword"
+                name="currentPassword"
+                value={formData.currentPassword}
+                onChange={handleInputChange}
+                style={styles.input}
+                placeholder="Enter your current password"
+                onFocus={(e) => {
+                  e.target.style.borderColor = styles.inputFocus.borderColor;
+                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = styles.input.borderColor;
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+            </div>
+
             {/* Password */}
             <div style={styles.fieldContainer}>
               <label htmlFor="password" style={styles.label}>
-                Password
+                New Password
               </label>
               <input
                 type="password"

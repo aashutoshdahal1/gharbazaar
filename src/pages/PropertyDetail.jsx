@@ -51,7 +51,23 @@ const PropertyDetail = () => {
     }
   }, [id, API_BASE_URL]);
 
-  const images = property?.images ? JSON.parse(property.images) : [];
+  const images = property?.images
+    ? (() => {
+        try {
+          const parsedImages = JSON.parse(property.images);
+          // Handle new format with cover image info
+          if (parsedImages.length > 0 && typeof parsedImages[0] === "object") {
+            return parsedImages.map((img) => img.url);
+          } else {
+            // Old format - just array of strings
+            return parsedImages;
+          }
+        } catch (error) {
+          console.error("Error parsing images:", error);
+          return [];
+        }
+      })()
+    : [];
 
   const styles = {
     container: {
@@ -281,39 +297,89 @@ const PropertyDetail = () => {
 
       <div style={styles.mainContent}>
         {/* Image Gallery */}
-        {images.length > 0 && (
+        {images.length > 0 ? (
           <div style={styles.imageGallery}>
             <img
               src={`${url.replace(/\/$/, "")}${images[currentImageIndex]}`}
               alt={property.title}
               style={styles.mainImage}
               onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/800x400?text=No+Image+Available";
+                e.target.style.display = "none";
+                e.target.nextSibling.style.display = "flex";
               }}
             />
+            <div
+              style={{
+                ...styles.mainImage,
+                display: "none",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#f3f4f6",
+                color: "#9ca3af",
+                fontSize: "18px",
+                fontWeight: "500",
+              }}
+            >
+              📷 Image not available
+            </div>
             {images.length > 1 && (
               <div style={styles.thumbnails}>
                 {images.map((image, index) => (
-                  <img
+                  <div
                     key={index}
-                    src={`${url.replace(/\/$/, "")}${image}`}
-                    alt={`Property ${index + 1}`}
-                    style={{
-                      ...styles.thumbnail,
-                      ...(index === currentImageIndex
-                        ? styles.thumbnailActive
-                        : {}),
-                    }}
-                    onClick={() => setCurrentImageIndex(index)}
-                    onError={(e) => {
-                      e.target.src =
-                        "https://via.placeholder.com/80x60?text=No+Image";
-                    }}
-                  />
+                    style={{ position: "relative", display: "inline-block" }}
+                  >
+                    <img
+                      src={`${url.replace(/\/$/, "")}${image}`}
+                      alt={`Property ${index + 1}`}
+                      style={{
+                        ...styles.thumbnail,
+                        ...(index === currentImageIndex
+                          ? styles.thumbnailActive
+                          : {}),
+                      }}
+                      onClick={() => setCurrentImageIndex(index)}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "flex";
+                      }}
+                    />
+                    <div
+                      style={{
+                        ...styles.thumbnail,
+                        display: "none",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#f3f4f6",
+                        color: "#9ca3af",
+                        fontSize: "10px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => setCurrentImageIndex(index)}
+                    >
+                      📷
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
+          </div>
+        ) : (
+          <div style={styles.imageGallery}>
+            <div
+              style={{
+                ...styles.mainImage,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#f3f4f6",
+                color: "#9ca3af",
+                fontSize: "18px",
+                fontWeight: "500",
+              }}
+            >
+              📷 No images available for this property
+            </div>
           </div>
         )}
 

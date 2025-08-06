@@ -952,13 +952,20 @@ const PropertyListing = () => {
             <div style={styles.propertyGrid}>
               {filteredProperties.map((property) => {
                 let images = [];
+                let coverImage = null;
                 try {
                   images = property.images ? JSON.parse(property.images) : [];
+                  // Handle new format with cover image info
+                  if (images.length > 0 && typeof images[0] === "object") {
+                    coverImage = images.find((img) => img.isCover) || images[0];
+                  } else if (images.length > 0) {
+                    // Fallback for old format
+                    coverImage = { url: images[0] };
+                  }
                 } catch (error) {
                   console.error("Error parsing images JSON:", error);
                   images = [];
                 }
-                const firstImage = images.length > 0 ? images[0] : null;
 
                 return (
                   <div
@@ -986,9 +993,9 @@ const PropertyListing = () => {
                     }}
                   >
                     <div style={styles.imageContainer}>
-                      {firstImage ? (
+                      {coverImage ? (
                         <img
-                          src={`${url.replace(/\/$/, "")}${firstImage}`}
+                          src={`${url.replace(/\/$/, "")}${coverImage.url}`}
                           alt={property.title}
                           style={styles.propertyImage}
                           onError={(e) => {
@@ -1000,7 +1007,7 @@ const PropertyListing = () => {
                       <div
                         style={{
                           ...styles.propertyImage,
-                          display: firstImage ? "none" : "flex",
+                          display: coverImage ? "none" : "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           backgroundColor: "#f3f4f6",

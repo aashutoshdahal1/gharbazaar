@@ -42,7 +42,7 @@ const MyListings = () => {
     };
 
     fetchData();
-  }, [navigate]);
+  }, [navigate, API_BASE_URL]);
 
   const handleDeleteListing = async (id) => {
     if (!window.confirm("Are you sure you want to delete this listing?")) {
@@ -110,19 +110,26 @@ const MyListings = () => {
           <div className="listings-grid">
             {listings.map((listing) => {
               let images = [];
+              let coverImage = null;
               try {
                 images = listing.images ? JSON.parse(listing.images) : [];
+                // Handle new format with cover image info
+                if (images.length > 0 && typeof images[0] === "object") {
+                  coverImage = images.find((img) => img.isCover) || images[0];
+                } else if (images.length > 0) {
+                  // Fallback for old format
+                  coverImage = { url: images[0] };
+                }
               } catch (error) {
                 console.error("Error parsing images JSON:", error);
                 images = [];
               }
-              const firstImage = images.length > 0 ? images[0] : null;
 
               return (
                 <div key={listing.id} className="listing-card">
-                  {firstImage ? (
+                  {coverImage ? (
                     <img
-                      src={`${url.replace(/\/$/, "")}${firstImage}`}
+                      src={`${url.replace(/\/$/, "")}${coverImage.url}`}
                       alt={listing.title}
                       className="listing-image"
                       onError={(e) => {
@@ -135,7 +142,7 @@ const MyListings = () => {
                   <div
                     className="listing-no-image"
                     style={{
-                      display: firstImage ? "none" : "flex",
+                      display: coverImage ? "none" : "flex",
                     }}
                   >
                     No Image Available
@@ -171,6 +178,12 @@ const MyListings = () => {
                     {listing.purpose === "rent" ? "/month" : ""}
                   </p>
                   <div className="listing-actions">
+                    <button
+                      className="btn-view"
+                      onClick={() => navigate(`/property/${listing.id}`)}
+                    >
+                      View
+                    </button>
                     <button
                       className="btn-edit"
                       onClick={() => navigate(`/edit-listing/${listing.id}`)}

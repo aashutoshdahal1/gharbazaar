@@ -63,6 +63,7 @@ export default function EditProperty() {
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
+  const [coverImageIndex, setCoverImageIndex] = useState(0);
   const [position, setPosition] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
@@ -100,10 +101,20 @@ export default function EditProperty() {
             phoneNumber: property.phone_number || "",
           });
 
-          // Set existing images
+          // Set existing images and cover index
           if (property.images) {
-            const imageUrls = JSON.parse(property.images);
-            setExistingImages(imageUrls);
+            const imageData = JSON.parse(property.images);
+            if (imageData.length > 0 && typeof imageData[0] === "object") {
+              // New format with cover image info
+              const imageUrls = imageData.map((img) => img.url);
+              const coverIndex = imageData.findIndex((img) => img.isCover);
+              setExistingImages(imageUrls);
+              setCoverImageIndex(coverIndex >= 0 ? coverIndex : 0);
+            } else {
+              // Old format - just array of strings
+              setExistingImages(imageData);
+              setCoverImageIndex(0);
+            }
           }
 
           // Set position if coordinates exist
@@ -180,7 +191,17 @@ export default function EditProperty() {
   };
 
   const removeExistingImage = (index) => {
+    // If removing the cover image, reset cover index
+    if (index === coverImageIndex) {
+      setCoverImageIndex(0);
+    } else if (index < coverImageIndex) {
+      setCoverImageIndex(coverImageIndex - 1);
+    }
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const setCoverImage = (index) => {
+    setCoverImageIndex(index);
   };
 
   const removeNewImage = (index) => {
@@ -215,8 +236,13 @@ export default function EditProperty() {
         submitData.append("longitude", position.lng);
       }
 
-      // Append existing images
-      submitData.append("existingImages", JSON.stringify(existingImages));
+      // Append existing images with cover image info
+      const imagesWithCover = existingImages.map((img, index) => ({
+        url: img,
+        isCover: index === coverImageIndex,
+      }));
+      submitData.append("existingImages", JSON.stringify(imagesWithCover));
+      submitData.append("coverImageIndex", coverImageIndex);
 
       // Append new images
       images.forEach((image) => {
@@ -429,23 +455,41 @@ export default function EditProperty() {
           {existingImages.length > 0 && (
             <div className="form-group">
               <label>Current Images</label>
+              <p className="form-help">
+                Click "Set as Cover" to choose the main image for your listing
+              </p>
               <div className="image-previews">
                 {existingImages.map((imageUrl, index) => (
                   <div key={`existing-${index}`} className="image-preview">
                     <img
-                      src={`${url}${imageUrl}`}
+                      src={`${url.replace(/\/$/, "")}${imageUrl}`}
                       alt={`Existing ${index + 1}`}
                       onError={(e) => {
+                        console.log("Image failed to load:", e.target.src);
                         e.target.style.display = "none";
                       }}
                     />
-                    <button
-                      type="button"
-                      className="remove-image"
-                      onClick={() => removeExistingImage(index)}
-                    >
-                      ✕
-                    </button>
+                    {coverImageIndex === index && (
+                      <div className="cover-badge">Cover Image</div>
+                    )}
+                    <div className="image-actions">
+                      {coverImageIndex !== index && (
+                        <button
+                          type="button"
+                          className="set-cover-btn"
+                          onClick={() => setCoverImage(index)}
+                        >
+                          Set as Cover
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="remove-image"
+                        onClick={() => removeExistingImage(index)}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

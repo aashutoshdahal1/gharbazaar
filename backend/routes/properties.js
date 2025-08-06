@@ -255,10 +255,38 @@ router.put(
       }
 
       // Combine existing images with new ones
-      const existingImageUrls = existingImages
-        ? JSON.parse(existingImages)
-        : [];
+      let existingImageUrls = [];
+      let coverIndex = 0;
+
+      if (existingImages) {
+        const parsedImages = JSON.parse(existingImages);
+        // Handle both old format (array of strings) and new format (array of objects)
+        existingImageUrls = parsedImages.map((img, index) => {
+          if (typeof img === "string") {
+            return img;
+          } else {
+            // New format with cover info
+            if (img.isCover) {
+              coverIndex = index;
+            }
+            return img.url;
+          }
+        });
+      }
+
+      // Add new images to existing ones
       const allImages = [...existingImageUrls, ...newImageUrls];
+
+      // If we have a coverImageIndex from request body, use it
+      if (req.body.coverImageIndex !== undefined) {
+        coverIndex = parseInt(req.body.coverImageIndex);
+      }
+
+      // Create final image array with cover information
+      const finalImages = allImages.map((imageUrl, index) => ({
+        url: imageUrl,
+        isCover: index === coverIndex,
+      }));
 
       // Update property
       await pool.execute(
@@ -274,7 +302,7 @@ router.put(
           address,
           area || null,
           phoneNumber || null,
-          JSON.stringify(allImages),
+          JSON.stringify(finalImages),
           latitude || null,
           longitude || null,
           propertyId,
