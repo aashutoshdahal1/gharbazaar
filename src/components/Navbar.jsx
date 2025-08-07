@@ -1,15 +1,70 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import url from "../apiurl";
 
 const Navbar = ({
   showDashboardButton = false,
   showViewDashboardButton = false,
+  showMessagesButton = false,
   showBackButton = false,
   backButtonText = "← Back",
   backButtonAction = null,
   showHomeAndProperties = true,
 }) => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+      setIsLoggedIn(!!(token && user));
+    };
+
+    checkLoginStatus();
+
+    // Listen for storage changes (login/logout events)
+    window.addEventListener("storage", checkLoginStatus);
+
+    return () => window.removeEventListener("storage", checkLoginStatus);
+  }, []);
+
+  // Fetch unread message count
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchUnreadCount();
+
+      // Poll for unread count every 30 seconds
+      const interval = setInterval(fetchUnreadCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isLoggedIn]);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(`${url}api/messages/conversations`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        const totalUnread = data.data.reduce(
+          (sum, conv) => sum + (conv.unread_count || 0),
+          0
+        );
+        setUnreadCount(totalUnread);
+      }
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  };
 
   const handleBackClick = () => {
     if (backButtonAction) {
@@ -99,6 +154,59 @@ const Navbar = ({
         </div>
 
         <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          {/* Message Icon for logged-in users */}
+          {isLoggedIn && (
+            <div
+              style={{
+                position: "relative",
+                cursor: "pointer",
+                padding: "8px",
+                borderRadius: "50%",
+                backgroundColor: "#f3f4f6",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "2px solid transparent",
+              }}
+              onClick={() => navigate("/messages")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#e5e7eb";
+                e.currentTarget.style.borderColor = "#2563eb";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#f3f4f6";
+                e.currentTarget.style.borderColor = "transparent";
+              }}
+            >
+              <span style={{ fontSize: "20px" }}>💬</span>
+              {unreadCount > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-2px",
+                    right: "-2px",
+                    backgroundColor: "#ef4444",
+                    color: "white",
+                    borderRadius: "50%",
+                    minWidth: "20px",
+                    height: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    padding: "2px 4px",
+                    border: "2px solid white",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </div>
+          )}
+
           {showBackButton && (
             <button
               style={{
@@ -114,6 +222,26 @@ const Navbar = ({
               onClick={handleBackClick}
             >
               {backButtonText}
+            </button>
+          )}
+          {showMessagesButton && (
+            <button
+              style={{
+                backgroundColor: "#10b981",
+                color: "white",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                border: "none",
+                fontSize: "14px",
+                fontWeight: "500",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onClick={() => navigate("/messages")}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#059669")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "#10b981")}
+            >
+              💬 Messages
             </button>
           )}
           {showViewDashboardButton && (

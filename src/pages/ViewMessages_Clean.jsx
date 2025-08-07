@@ -43,7 +43,7 @@ const ViewMessages = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      
+
       if (!token) {
         setError("Please log in to view messages");
         setLoading(false);
@@ -71,76 +71,94 @@ const ViewMessages = () => {
     }
   }, [API_BASE_URL]);
 
-  const fetchMessages = useCallback(async (listingId, otherUserId, isPolling = false) => {
-    try {
-      const token = localStorage.getItem("token");
-      
-      if (!token) {
-        console.error("No token found");
-        return;
-      }
+  const fetchMessages = useCallback(
+    async (listingId, otherUserId, isPolling = false) => {
+      try {
+        const token = localStorage.getItem("token");
 
-      if (!isPolling) {
-        console.log(`Fetching messages for listing ${listingId} with user ${otherUserId}`);
-      }
-      
-      const response = await fetch(`${API_BASE_URL}/messages/conversation/${listingId}/${otherUserId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        if (!token) {
+          console.error("No token found");
+          return;
+        }
 
-      const data = await response.json();
-      
-      if (!isPolling) {
-        console.log("API Response:", data);
-      }
+        if (!isPolling) {
+          console.log(
+            `Fetching messages for listing ${listingId} with user ${otherUserId}`
+          );
+        }
 
-      if (response.ok && data.success) {
-        // Only update if messages have changed (for polling)
-        if (isPolling) {
-          setMessages(prevMessages => {
-            // Compare message count and last message ID for better performance
-            const newMessages = data.data;
-            const hasNewMessages = newMessages.length > prevMessages.length || 
-              (newMessages.length > 0 && prevMessages.length > 0 && 
-               newMessages[newMessages.length - 1].id !== prevMessages[prevMessages.length - 1].id);
-            
-            if (hasNewMessages) {
-              // Only scroll if user is near the bottom of the chat
-              setTimeout(() => {
-                const messageContainer = document.querySelector('[data-messages-container="true"]');
-                if (messageContainer) {
-                  const isNearBottom = messageContainer.scrollTop + messageContainer.clientHeight >= messageContainer.scrollHeight - 50;
-                  if (isNearBottom) {
-                    scrollToBottom();
+        const response = await fetch(
+          `${API_BASE_URL}/messages/conversation/${listingId}/${otherUserId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!isPolling) {
+          console.log("API Response:", data);
+        }
+
+        if (response.ok && data.success) {
+          // Only update if messages have changed (for polling)
+          if (isPolling) {
+            setMessages((prevMessages) => {
+              // Compare message count and last message ID for better performance
+              const newMessages = data.data;
+              const hasNewMessages =
+                newMessages.length > prevMessages.length ||
+                (newMessages.length > 0 &&
+                  prevMessages.length > 0 &&
+                  newMessages[newMessages.length - 1].id !==
+                    prevMessages[prevMessages.length - 1].id);
+
+              if (hasNewMessages) {
+                // Only scroll if user is near the bottom of the chat
+                setTimeout(() => {
+                  const messageContainer = document.querySelector(
+                    '[data-messages-container="true"]'
+                  );
+                  if (messageContainer) {
+                    const isNearBottom =
+                      messageContainer.scrollTop +
+                        messageContainer.clientHeight >=
+                      messageContainer.scrollHeight - 50;
+                    if (isNearBottom) {
+                      scrollToBottom();
+                    }
                   }
-                }
-              }, 100);
-              return newMessages;
-            }
-            return prevMessages; // No change
-          });
+                }, 100);
+                return newMessages;
+              }
+              return prevMessages; // No change
+            });
+          } else {
+            setMessages(data.data);
+            // Scroll to bottom after updating messages (initial load)
+            setTimeout(() => scrollToBottom(), 100);
+          }
         } else {
-          setMessages(data.data);
-          // Scroll to bottom after updating messages (initial load)
-          setTimeout(() => scrollToBottom(), 100);
+          console.error("Failed to fetch messages:", data.message);
+          // If it's a 403, show a more user-friendly error
+          if (response.status === 403) {
+            console.error(
+              "Access denied - you may not have permission to view this conversation"
+            );
+          }
         }
-      } else {
-        console.error("Failed to fetch messages:", data.message);
-        // If it's a 403, show a more user-friendly error
-        if (response.status === 403) {
-          console.error("Access denied - you may not have permission to view this conversation");
-        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
       }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  }, [API_BASE_URL]);
+    },
+    [API_BASE_URL]
+  );
 
   useEffect(() => {
     fetchConversations();
-    
+
     // Start polling for new conversations every 10 seconds
     const conversationInterval = setInterval(() => {
       if (!isPolling) {
@@ -158,11 +176,19 @@ const ViewMessages = () => {
       console.log("Current user ID:", getUserId());
       // Reset the initial load flag when switching conversations
       selectedConversation.hasInitialLoad = false;
-      fetchMessages(selectedConversation.listing_id, selectedConversation.other_user_id, false);
-      
+      fetchMessages(
+        selectedConversation.listing_id,
+        selectedConversation.other_user_id,
+        false
+      );
+
       // Start polling for new messages every 5 seconds
       const messageInterval = setInterval(() => {
-        fetchMessages(selectedConversation.listing_id, selectedConversation.other_user_id, true);
+        fetchMessages(
+          selectedConversation.listing_id,
+          selectedConversation.other_user_id,
+          true
+        );
       }, 5000);
 
       return () => clearInterval(messageInterval);
@@ -192,14 +218,21 @@ const ViewMessages = () => {
 
   // Auto-select conversation based on URL parameters
   useEffect(() => {
-    const listingId = searchParams.get('listing');
-    const userId = searchParams.get('user');
-    
-    if (listingId && userId && conversations.length > 0 && !selectedConversation) {
+    const listingId = searchParams.get("listing");
+    const userId = searchParams.get("user");
+
+    if (
+      listingId &&
+      userId &&
+      conversations.length > 0 &&
+      !selectedConversation
+    ) {
       const matchingConversation = conversations.find(
-        conv => conv.listing_id === parseInt(listingId) && conv.other_user_id === parseInt(userId)
+        (conv) =>
+          conv.listing_id === parseInt(listingId) &&
+          conv.other_user_id === parseInt(userId)
       );
-      
+
       if (matchingConversation) {
         setSelectedConversation(matchingConversation);
       }
@@ -212,7 +245,7 @@ const ViewMessages = () => {
 
     try {
       const token = localStorage.getItem("token");
-      
+
       if (!token) {
         alert("Please log in to send messages");
         return;
@@ -236,13 +269,17 @@ const ViewMessages = () => {
       if (data.success) {
         setNewMessage("");
         // Add the new message to the messages list
-        setMessages(prev => [...prev, data.data]);
+        setMessages((prev) => [...prev, data.data]);
         // Update the conversation's last message
-        setConversations(prev => 
-          prev.map(conv => 
-            conv.listing_id === selectedConversation.listing_id && 
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.listing_id === selectedConversation.listing_id &&
             conv.other_user_id === selectedConversation.other_user_id
-              ? { ...conv, last_message: newMessage, last_message_time: new Date().toISOString() }
+              ? {
+                  ...conv,
+                  last_message: newMessage,
+                  last_message_time: new Date().toISOString(),
+                }
               : conv
           )
         );
@@ -338,13 +375,15 @@ const ViewMessages = () => {
           <div style={styles.sidebarHeader}>
             <h2 style={styles.sidebarTitle}>Messages</h2>
           </div>
-          
+
           <div style={styles.conversationsList}>
             {conversations.length === 0 ? (
               <div style={styles.emptyState}>
                 <div style={styles.emptyIcon}>💬</div>
                 <div style={styles.emptyText}>No conversations yet</div>
-                <div style={styles.emptySubtext}>Start messaging property owners to see conversations here</div>
+                <div style={styles.emptySubtext}>
+                  Start messaging property owners to see conversations here
+                </div>
               </div>
             ) : (
               conversations.map((conversation) => (
@@ -352,9 +391,12 @@ const ViewMessages = () => {
                   key={`${conversation.listing_id}-${conversation.other_user_id}`}
                   style={{
                     ...styles.conversationItem,
-                    ...(selectedConversation?.listing_id === conversation.listing_id && 
-                         selectedConversation?.other_user_id === conversation.other_user_id 
-                         ? styles.selectedConversation : {}),
+                    ...(selectedConversation?.listing_id ===
+                      conversation.listing_id &&
+                    selectedConversation?.other_user_id ===
+                      conversation.other_user_id
+                      ? styles.selectedConversation
+                      : {}),
                   }}
                   onClick={() => setSelectedConversation(conversation)}
                 >
@@ -363,19 +405,27 @@ const ViewMessages = () => {
                   </div>
                   <div style={styles.conversationContent}>
                     <div style={styles.conversationHeader}>
-                      <div style={styles.conversationName}>{conversation.other_user_name}</div>
+                      <div style={styles.conversationName}>
+                        {conversation.other_user_name}
+                      </div>
                       <div style={styles.conversationTime}>
-                        {conversation.last_message_time ? formatDate(conversation.last_message_time) : ""}
+                        {conversation.last_message_time
+                          ? formatDate(conversation.last_message_time)
+                          : ""}
                       </div>
                     </div>
-                    <div style={styles.conversationProperty}>{conversation.listing_title}</div>
+                    <div style={styles.conversationProperty}>
+                      {conversation.listing_title}
+                    </div>
                     <div style={styles.conversationLastMessage}>
-                      {conversation.last_message?.length > 50 
-                        ? conversation.last_message.substring(0, 50) + "..." 
+                      {conversation.last_message?.length > 50
+                        ? conversation.last_message.substring(0, 50) + "..."
                         : conversation.last_message || "No messages yet"}
                     </div>
                     {conversation.unread_count > 0 && (
-                      <div style={styles.unreadBadge}>{conversation.unread_count}</div>
+                      <div style={styles.unreadBadge}>
+                        {conversation.unread_count}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -391,24 +441,35 @@ const ViewMessages = () => {
               {/* Chat Header */}
               <div style={styles.chatHeader}>
                 <div style={styles.chatHeaderInfo}>
-                  <div style={styles.chatHeaderName}>{selectedConversation.other_user_name}</div>
-                  <div style={styles.chatHeaderProperty}>{selectedConversation.listing_title}</div>
+                  <div style={styles.chatHeaderName}>
+                    {selectedConversation.other_user_name}
+                  </div>
+                  <div style={styles.chatHeaderProperty}>
+                    {selectedConversation.listing_title}
+                  </div>
                 </div>
                 <button
                   style={styles.viewPropertyButton}
-                  onClick={() => navigate(`/property/${selectedConversation.listing_id}`)}
+                  onClick={() =>
+                    navigate(`/property/${selectedConversation.listing_id}`)
+                  }
                 >
                   View Property
                 </button>
               </div>
 
               {/* Messages */}
-              <div style={styles.messagesContainer} data-messages-container="true">
+              <div
+                style={styles.messagesContainer}
+                data-messages-container="true"
+              >
                 {messages.length === 0 ? (
                   <div style={styles.emptyMessages}>
                     <div style={styles.emptyMessagesIcon}>💬</div>
                     <div style={styles.emptyMessagesText}>No messages yet</div>
-                    <div style={styles.emptyMessagesSubtext}>Start the conversation!</div>
+                    <div style={styles.emptyMessagesSubtext}>
+                      Start the conversation!
+                    </div>
                   </div>
                 ) : (
                   messages.map((message) => (
@@ -416,13 +477,19 @@ const ViewMessages = () => {
                       key={message.id}
                       style={{
                         ...styles.messageContainer,
-                        ...(message.sender_id === getUserId() ? styles.sentMessage : styles.receivedMessage),
+                        ...(message.sender_id === getUserId()
+                          ? styles.sentMessage
+                          : styles.receivedMessage),
                       }}
                     >
-                      <div style={{
-                        ...styles.messageContent,
-                        ...(message.sender_id === getUserId() ? styles.sentMessageContent : styles.receivedMessageContent),
-                      }}>
+                      <div
+                        style={{
+                          ...styles.messageContent,
+                          ...(message.sender_id === getUserId()
+                            ? styles.sentMessageContent
+                            : styles.receivedMessageContent),
+                        }}
+                      >
                         <div style={styles.messageText}>{message.message}</div>
                         <div style={styles.messageTime}>
                           {formatTime(message.created_at)}
@@ -452,7 +519,9 @@ const ViewMessages = () => {
           ) : (
             <div style={styles.noConversationSelected}>
               <div style={styles.noConversationIcon}>💬</div>
-              <div style={styles.noConversationText}>Select a conversation to start messaging</div>
+              <div style={styles.noConversationText}>
+                Select a conversation to start messaging
+              </div>
             </div>
           )}
         </div>

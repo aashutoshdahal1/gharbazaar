@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import url from "../apiurl";
 import Navbar from "../components/Navbar";
+import SendMessage from "../components/SendMessage";
 
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -24,6 +25,7 @@ const PropertyDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showSendMessage, setShowSendMessage] = useState(false);
 
   const API_BASE_URL = url + "api";
 
@@ -51,6 +53,19 @@ const PropertyDetail = () => {
       fetchProperty();
     }
   }, [id, API_BASE_URL]);
+
+  const handleSendMessage = (messageData) => {
+    // Show success message and redirect to messages
+    console.log("Message sent successfully:", messageData);
+
+    // Show success notification
+    alert("Message sent successfully! Redirecting to messages...");
+
+    // Redirect to messages page with conversation parameters
+    setTimeout(() => {
+      navigate(`/messages?listing=${property.id}&user=${property.user_id}`);
+    }, 1000);
+  };
 
   const images = property?.images
     ? (() => {
@@ -510,6 +525,7 @@ const PropertyDetail = () => {
                   ...styles.contactButton,
                   backgroundColor: "#10b981",
                 }}
+                onClick={() => setShowSendMessage(true)}
               >
                 💬 Send Message
               </button>
@@ -527,6 +543,15 @@ const PropertyDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Send Message Modal */}
+      {showSendMessage && (
+        <SendMessage
+          property={property}
+          onClose={() => setShowSendMessage(false)}
+          onMessageSent={handleSendMessage}
+        />
+      )}
     </div>
   );
 };

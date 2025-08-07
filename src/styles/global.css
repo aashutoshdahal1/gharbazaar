@@ -901,7 +901,7 @@ body {
 
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 3fr 1fr 1fr;
+  grid-template-columns: 2fr 2fr 2fr 1fr 1.5fr;
   gap: var(--space-lg);
   background: var(--bg-light);
   padding: var(--space-lg);
@@ -918,11 +918,12 @@ body {
 
 .message-row {
   display: grid;
-  grid-template-columns: 2fr 3fr 1fr 1fr;
+  grid-template-columns: 2fr 2fr 2fr 1fr 1.5fr;
   gap: var(--space-lg);
   padding: var(--space-lg);
   border-bottom: 1px solid var(--border-light);
   transition: all var(--transition-normal);
+  cursor: pointer;
 }
 
 .message-row:hover {
@@ -967,6 +968,9 @@ body {
 }
 
 .message-date {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
   color: var(--text-secondary);
   font-size: var(--text-sm);
 }
@@ -981,6 +985,9 @@ body {
   font-weight: var(--font-medium);
   cursor: pointer;
   transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
 .action-button:hover {
