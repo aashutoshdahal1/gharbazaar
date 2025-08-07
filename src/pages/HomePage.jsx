@@ -404,8 +404,8 @@ export default function GharBazaarHomepage() {
       cursor: "pointer",
       transition: "all 0.3s ease",
       border: "1px solid #e5e7eb",
-      maxWidth: "400px",
-      margin: "0 auto",
+      width: "100%",
+      minWidth: isMobile ? "0" : "280px",
     },
     cardImage: {
       height: isMobile ? "8rem" : "12rem",

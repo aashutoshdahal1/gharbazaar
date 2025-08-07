@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import url from "../apiurl";
 import Navbar from "../components/Navbar";
 
 const PropertyListing = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState("grid");
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [propertyType, setPropertyType] = useState("");
@@ -17,6 +18,14 @@ const PropertyListing = () => {
   const [totalProperties, setTotalProperties] = useState(0);
 
   const API_BASE_URL = url + "api";
+
+  // Read search query from URL parameters on component mount
+  useEffect(() => {
+    const searchFromURL = searchParams.get("search");
+    if (searchFromURL) {
+      setSearchQuery(decodeURIComponent(searchFromURL));
+    }
+  }, [searchParams]);
 
   // Fetch all properties from backend
   useEffect(() => {
@@ -98,10 +107,28 @@ const PropertyListing = () => {
     setPropertyType("");
     setPurpose("");
     setSearchQuery("");
+    // Clear search parameter from URL
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete("search");
+    setSearchParams(newSearchParams, { replace: true });
   };
 
   const handleSearch = () => {
     // Search functionality is handled by useEffect above
+  };
+
+  const handleSearchQueryChange = (e) => {
+    const newQuery = e.target.value;
+    setSearchQuery(newQuery);
+    
+    // Update URL with search parameter
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (newQuery.trim()) {
+      newSearchParams.set("search", encodeURIComponent(newQuery));
+    } else {
+      newSearchParams.delete("search");
+    }
+    setSearchParams(newSearchParams, { replace: true });
   };
 
   const handleGoHome = () => {
@@ -605,6 +632,28 @@ const PropertyListing = () => {
             >
               Reset All
             </button>
+          </div>
+
+          {/* Search Input */}
+          <div style={styles.filterSection}>
+            <label style={styles.filterLabel}>Search Properties</label>
+            <div style={styles.searchContainer}>
+              <input
+                type="text"
+                placeholder="Search by title, location, or description..."
+                value={searchQuery}
+                onChange={handleSearchQueryChange}
+                style={{
+                  ...styles.searchInput,
+                  width: "100%",
+                  padding: "12px 16px",
+                  fontSize: "14px",
+                  borderRadius: "8px",
+                  border: "1px solid #d1d5db",
+                  backgroundColor: "white",
+                }}
+              />
+            </div>
           </div>
 
           {/* Price Range */}
