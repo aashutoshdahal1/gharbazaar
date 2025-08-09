@@ -14,7 +14,9 @@ import AddProperty from "./pages/AddProperty";
 import EditProperty from "./pages/EditProperty";
 import EditProfile from "./pages/EditProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ViewMessages from "./pages/ViewMessages"; // Updated import path
+import ViewMessages from "./pages/ViewMessages";
+import Admin from "./pages/admin"; // Admin login page
+import AdminDashboard from "./pages/adminDashboard"; // Admin dashboard
 
 function App() {
   return (
@@ -94,6 +96,22 @@ function App() {
           element={
             <ProtectedRoute>
               <ViewMessages />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
