@@ -7,7 +7,7 @@ const PropertyListing = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState("grid");
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 50000000]); // Increased max to 50 million
   const [propertyType, setPropertyType] = useState("");
   const [purpose, setPurpose] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,32 +32,100 @@ const PropertyListing = () => {
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/properties`);
+        setError("");
+        const response = await fetch(`${API_BASE_URL}/properties`, {
+          // Add cache-busting to ensure fresh data
+          cache: "no-cache",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.success) {
+          console.log("Fetched properties:", data.data.length); // Debug log
           setProperties(data.data);
           setFilteredProperties(data.data);
           setTotalProperties(data.data.length);
         } else {
-          setError("Failed to fetch properties");
+          setError(data.message || "Failed to fetch properties");
         }
       } catch (error) {
         console.error("Error fetching properties:", error);
-        setError("An error occurred while fetching properties");
+        setError(
+          "An error occurred while fetching properties: " + error.message
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchProperties();
+
+    // Also listen for storage events to refresh when new property is added
+    const handleStorageChange = (e) => {
+      if (e.key === "property_added") {
+        console.log("Property added event detected, refreshing...");
+        fetchProperties();
+        // Clean up the flag
+        localStorage.removeItem("property_added");
+      }
+    };
+
+    // Listen for custom property added event
+    const handlePropertyAdded = () => {
+      console.log("Property added custom event detected, refreshing...");
+      fetchProperties();
+    };
+
+    // Listen for visibility change to refresh when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log("Page became visible, checking for updates...");
+        fetchProperties();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("propertyAdded", handlePropertyAdded);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Check localStorage on component mount
+    if (localStorage.getItem("property_added")) {
+      console.log("Found property_added flag on mount, refreshing...");
+      localStorage.removeItem("property_added");
+      // Slight delay to ensure this runs after the initial fetch
+      setTimeout(fetchProperties, 100);
+    }
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("propertyAdded", handlePropertyAdded);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [API_BASE_URL]);
 
   // Filter properties based on criteria
   useEffect(() => {
+    console.log("Filtering properties. Total properties:", properties.length);
+    console.log("Filter criteria:", {
+      priceRange,
+      propertyType,
+      purpose,
+      searchQuery,
+    });
+
     let filtered = properties.filter((property) => {
+      // Convert price to number for comparison
+      const propertyPrice = parseFloat(property.price) || 0;
+
       const priceInRange =
-        property.price >= priceRange[0] && property.price <= priceRange[1];
+        propertyPrice >= priceRange[0] && propertyPrice <= priceRange[1];
 
       const typeMatch =
         !propertyType ||
@@ -72,17 +140,30 @@ const PropertyListing = () => {
         property.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         property.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
+      console.log(
+        "Property:",
+        property.id,
+        "Price:",
+        propertyPrice,
+        "Matches:",
+        { priceInRange, typeMatch, purposeMatch, searchMatch }
+      );
+
       return priceInRange && typeMatch && purposeMatch && searchMatch;
     });
 
     // Sort properties by price (optional)
     filtered.sort((a, b) => {
+      const priceA = parseFloat(a.price) || 0;
+      const priceB = parseFloat(b.price) || 0;
+
       if (purpose === "rent") {
-        return a.price - b.price; // Ascending for rent
+        return priceA - priceB; // Ascending for rent
       }
-      return b.price - a.price; // Descending for sale
+      return priceB - priceA; // Descending for sale
     });
 
+    console.log("Filtered properties count:", filtered.length);
     setFilteredProperties(filtered);
     setTotalProperties(filtered.length);
   }, [properties, priceRange, propertyType, purpose, searchQuery]);
@@ -103,7 +184,7 @@ const PropertyListing = () => {
   };
 
   const resetFilters = () => {
-    setPriceRange([0, 100000]);
+    setPriceRange([0, 50000000]); // Updated to match new default
     setPropertyType("");
     setPurpose("");
     setSearchQuery("");
@@ -113,14 +194,43 @@ const PropertyListing = () => {
     setSearchParams(newSearchParams, { replace: true });
   };
 
-  const handleSearch = () => {
-    // Search functionality is handled by useEffect above
+  const refreshProperties = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/properties`, {
+        cache: "no-cache",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log("Refreshed properties:", data.data.length);
+        setProperties(data.data);
+        setFilteredProperties(data.data);
+        setTotalProperties(data.data.length);
+        setError(""); // Clear any previous errors
+      } else {
+        setError(data.message || "Failed to fetch properties");
+      }
+    } catch (error) {
+      console.error("Error refreshing properties:", error);
+      setError("An error occurred while fetching properties: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSearchQueryChange = (e) => {
     const newQuery = e.target.value;
     setSearchQuery(newQuery);
-    
+
     // Update URL with search parameter
     const newSearchParams = new URLSearchParams(searchParams);
     if (newQuery.trim()) {
@@ -129,10 +239,6 @@ const PropertyListing = () => {
       newSearchParams.delete("search");
     }
     setSearchParams(newSearchParams, { replace: true });
-  };
-
-  const handleGoHome = () => {
-    navigate("/");
   };
 
   const handleAddProperty = () => {
@@ -609,29 +715,53 @@ const PropertyListing = () => {
             }}
           >
             <h3 style={styles.sidebarTitle}>Filters</h3>
-            <button
-              onClick={resetFilters}
-              style={{
-                backgroundColor: "transparent",
-                color: "#6b7280",
-                border: "1px solid #d1d5db",
-                padding: "6px 12px",
-                borderRadius: "6px",
-                fontSize: "12px",
-                cursor: "pointer",
-                fontWeight: "500",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#f9fafb";
-                e.target.style.borderColor = "#9ca3af";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-                e.target.style.borderColor = "#d1d5db";
-              }}
-            >
-              Reset All
-            </button>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button
+                onClick={refreshProperties}
+                style={{
+                  backgroundColor: "#10b981",
+                  color: "white",
+                  border: "none",
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#059669";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "#10b981";
+                }}
+                title="Refresh to check for new properties"
+              >
+                🔄 Refresh
+              </button>
+              <button
+                onClick={resetFilters}
+                style={{
+                  backgroundColor: "transparent",
+                  color: "#6b7280",
+                  border: "1px solid #d1d5db",
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#f9fafb";
+                  e.target.style.borderColor = "#9ca3af";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.borderColor = "#d1d5db";
+                }}
+              >
+                Reset All
+              </button>
+            </div>
           </div>
 
           {/* Search Input */}
@@ -712,7 +842,7 @@ const PropertyListing = () => {
                       width: "100%",
                       padding: "8px 12px",
                     }}
-                    placeholder="100000"
+                    placeholder="50000000"
                   />
                 </div>
               </div>
@@ -720,7 +850,7 @@ const PropertyListing = () => {
                 <input
                   type="range"
                   min="0"
-                  max="100000"
+                  max="50000000"
                   value={priceRange[1]}
                   onChange={(e) => handlePriceChange(1, e.target.value)}
                   style={{
@@ -738,7 +868,7 @@ const PropertyListing = () => {
                   }}
                 >
                   <span>₹0</span>
-                  <span>₹1L+</span>
+                  <span>₹5Cr+</span>
                 </div>
               </div>
             </div>
@@ -1135,7 +1265,7 @@ const PropertyListing = () => {
                                 ? "Monthly Rent"
                                 : "Price"}
                             </span>
-                            Rs {parseInt(property.price).toLocaleString()}
+                            Rs {parseFloat(property.price).toLocaleString()}
                             {property.purpose === "rent" ? "/mo" : ""}
                           </div>
                           <div
@@ -1269,7 +1399,7 @@ const PropertyListing = () => {
                               ? "Monthly Rent"
                               : "Price"}
                           </span>
-                          Rs {parseInt(property.price).toLocaleString()}
+                          Rs {parseFloat(property.price).toLocaleString()}
                           {property.purpose === "rent" ? "/mo" : ""}
                         </div>
                         <span style={styles.typeTag}>

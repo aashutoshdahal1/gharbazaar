@@ -183,6 +183,17 @@ export default function AddProperty() {
 
       if (data.success) {
         setSuccess("Property listed successfully!");
+
+        // Set a flag in localStorage to trigger refresh in FilterPage
+        localStorage.setItem("property_added", "true");
+
+        // Dispatch a custom event to notify other components
+        window.dispatchEvent(
+          new CustomEvent("propertyAdded", {
+            detail: data.data,
+          })
+        );
+
         setTimeout(() => {
           navigate("/my-listings");
         }, 2000);
