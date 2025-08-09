@@ -8,12 +8,13 @@ import FilterPage from "./pages/FilterPage";
 import PropertyDetail from "./pages/PropertyDetail";
 import UserDashboard from "./pages/UserDashboard";
 import MyListings from "./pages/MyListings";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import AddProperty from "./pages/AddProperty";
 import EditProperty from "./pages/EditProperty";
 import EditProfile from "./pages/EditProfile";
-import ProtectedRoute from "./components/ProtectedRoute";
 import ViewMessages from "./pages/ViewMessages";
 import Admin from "./pages/admin"; // Admin login page
 import AdminDashboard from "./pages/adminDashboard"; // Admin dashboard
@@ -99,20 +100,13 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin" element={<Admin />} />
         <Route
           path="/admin-dashboard"
           element={
-            <ProtectedRoute>
+            <AdminProtectedRoute>
               <AdminDashboard />
-            </ProtectedRoute>
+            </AdminProtectedRoute>
           }
         />
       </Routes>

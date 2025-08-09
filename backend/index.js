@@ -9,6 +9,7 @@ const setupDatabase = require("./scripts/setupDatabase"); // 👈 Your DB setup 
 const authRoutes = require("./routes/auth");
 const propertyRoutes = require("./routes/properties");
 const messageRoutes = require("./routes/messages");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -22,6 +23,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ✅ Ensure DB is created before server starts
 async function startServer() {

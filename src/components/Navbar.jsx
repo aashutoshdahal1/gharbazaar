@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../apiurl";
+import { LogoDisplay } from "../utils/logoManager.jsx";
 
 const Navbar = ({
   showDashboardButton = false,
@@ -101,7 +102,7 @@ const Navbar = ({
             gap: "20px",
           }}
         >
-          <div
+          <LogoDisplay
             style={{
               fontSize: "24px",
               fontWeight: "bold",
@@ -111,10 +112,9 @@ const Navbar = ({
               alignItems: "center",
               gap: "8px",
             }}
+            size="medium"
             onClick={() => navigate("/")}
-          >
-            🏠 GharBazaar
-          </div>
+          />
           {showHomeAndProperties && (
             <nav style={{ display: "flex", gap: "20px" }}>
               <span

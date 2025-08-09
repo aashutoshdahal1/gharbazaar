@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../apiurl";
 import Navbar from "../components/Navbar";
+import { LogoDisplay } from "../utils/logoManager.jsx";
 
 export default function GharBazaarHomepage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -556,15 +557,15 @@ export default function GharBazaarHomepage() {
       <header style={styles.header}>
         <div style={styles.headerContent}>
           {/* Logo */}
-          <div
+          <LogoDisplay
             style={styles.logo}
+            size="medium"
             onClick={handleLogoClick}
-            onMouseEnter={(e) => (e.target.style.transform = "scale(1.02)")}
-            onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
-          >
-            <span style={styles.logoIcon}>🏠</span>
-            <span>GharBazaar</span>
-          </div>
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.02)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          />
 
           {/* Navigation Links */}
           <nav style={styles.navSection}>
@@ -974,7 +975,11 @@ export default function GharBazaarHomepage() {
         <div style={styles.footerPattern}></div>
         <div style={styles.footerContent}>
           <div style={styles.footerSection}>
-            <div style={styles.footerTitle}>🏠 GharBazaar</div>
+            <LogoDisplay
+              style={styles.footerTitle}
+              size="large"
+              showText={true}
+            />
             <p style={styles.footerText}>
               Your trusted platform for finding the perfect home in Nepal. We
               connect property seekers with their dream properties across the
