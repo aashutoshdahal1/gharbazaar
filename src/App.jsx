@@ -16,8 +16,9 @@ import AddProperty from "./pages/AddProperty";
 import EditProperty from "./pages/EditProperty";
 import EditProfile from "./pages/EditProfile";
 import ViewMessages from "./pages/ViewMessages";
-import Admin from "./pages/admin"; // Admin login page
-import AdminDashboard from "./pages/adminDashboard"; // Admin dashboard
+import Admin from "./pages/admin";
+import AdminDashboard from "./pages/adminDashboard";
+import About from "./pages/about";
 
 function App() {
   return (
@@ -109,6 +110,7 @@ function App() {
             </AdminProtectedRoute>
           }
         />
+        <Route path="/about" element={<About />} />
       </Routes>
     </BrowserRouter>
   );

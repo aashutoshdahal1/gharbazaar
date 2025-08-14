@@ -1296,3 +1296,32 @@ body {
 .dashboard-site-info-grid span {
   color: var(--success-color);
 }
+
+/* Existing global.css content remains unchanged, append the following: */
+
+/* Team Member Styles */
+.team-member {
+  text-align: center;
+  padding: var(--space-xl);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-primary);
+  transition: all var(--transition-normal);
+}
+
+.team-member:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.team-member-name {
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.team-member-role {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  margin: 0;
+}

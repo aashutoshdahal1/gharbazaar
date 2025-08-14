@@ -594,6 +594,7 @@ export default function GharBazaarHomepage() {
                   style={styles.navLink}
                   onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
                   onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                  onClick={() => window.location.href = "/about"}
                 >
                   About
                 </span>
@@ -1060,7 +1061,7 @@ export default function GharBazaarHomepage() {
             <ul style={styles.footerList}>
               <li style={styles.footerListItem}>
                 <a
-                  href="#"
+                  href="/about"
                   style={styles.footerLink}
                   onMouseEnter={(e) => {
                     e.target.style.color = "#3b82f6";
