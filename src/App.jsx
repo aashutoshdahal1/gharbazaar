@@ -19,6 +19,7 @@ import ViewMessages from "./pages/ViewMessages";
 import Admin from "./pages/admin";
 import AdminDashboard from "./pages/adminDashboard";
 import About from "./pages/about";
+import Contact from "./pages/contact"; // ✅ Added import
 
 function App() {
   return (
@@ -111,6 +112,7 @@ function App() {
           }
         />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} /> {/* ✅ New Contact route */}
       </Routes>
     </BrowserRouter>
   );
