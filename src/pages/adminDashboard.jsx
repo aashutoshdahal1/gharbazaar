@@ -21,6 +21,16 @@ const AdminDashboard = () => {
 
   const API_BASE_URL = url + "api";
 
+  useEffect(() => {
+    const styleId = 'admin-dashboard-styles';
+    
+    // Remove existing styles if they exist
+    const existingStyle = document.getElementById(styleId);
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+  }, []);
+
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
@@ -168,90 +178,27 @@ const AdminDashboard = () => {
     switch (activeSection) {
       case "overview":
         return (
-          <div>
-            <h2
-              style={{
-                fontSize: "2rem",
-                marginBottom: "30px",
-                color: "#1f2937",
-              }}
-            >
-              Dashboard Overview
-            </h2>
+          <div className="admin-dashboard-section">
+            <h2 className="card-title">Dashboard Overview</h2>
 
             {error && (
-              <div
-                style={{
-                  backgroundColor: "#fee2e2",
-                  color: "#dc2626",
-                  padding: "12px 16px",
-                  borderRadius: "8px",
-                  marginBottom: "20px",
-                }}
-              >
+              <div className="alert alert-error">
                 {error}
               </div>
             )}
 
             {/* Stats Cards */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                gap: "30px",
-                marginBottom: "40px",
-              }}
-            >
+            <div className="grid grid-2 gap-5 mb-5">
               {/* Total Listings Card */}
               <div
                 onClick={handleTotalListingsClick}
-                style={{
-                  backgroundColor: "white",
-                  padding: "30px",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  border: "2px solid #e5e7eb",
-                  textAlign: "center",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-5px)";
-                  e.target.style.boxShadow =
-                    "0 20px 25px -5px rgba(0, 0, 0, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow =
-                    "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
-                }}
+                className="dashboard-card"
               >
-                <div
-                  style={{
-                    fontSize: "60px",
-                    marginBottom: "20px",
-                    color: "#3b82f6",
-                  }}
-                >
-                  🏠
-                </div>
-                <h2
-                  style={{
-                    fontSize: "3rem",
-                    fontWeight: "bold",
-                    color: "#1f2937",
-                    margin: "0 0 10px 0",
-                  }}
-                >
+                <div className="dashboard-card-icon">🏠</div>
+                <h2 className="dashboard-card-title">
                   {loading ? "..." : dashboardData.totalListings}
                 </h2>
-                <p
-                  style={{
-                    fontSize: "1.25rem",
-                    color: "#6b7280",
-                    margin: 0,
-                  }}
-                >
+                <p className="dashboard-card-subtitle">
                   Total Listings
                 </p>
               </div>
@@ -259,112 +206,32 @@ const AdminDashboard = () => {
               {/* Total Users Card */}
               <div
                 onClick={handleTotalUsersClick}
-                style={{
-                  backgroundColor: "white",
-                  padding: "30px",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  border: "2px solid #e5e7eb",
-                  textAlign: "center",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-5px)";
-                  e.target.style.boxShadow =
-                    "0 20px 25px -5px rgba(0, 0, 0, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow =
-                    "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
-                }}
+                className="dashboard-card"
               >
-                <div
-                  style={{
-                    fontSize: "60px",
-                    marginBottom: "20px",
-                    color: "#10b981",
-                  }}
-                >
-                  👥
-                </div>
-                <h2
-                  style={{
-                    fontSize: "3rem",
-                    fontWeight: "bold",
-                    color: "#1f2937",
-                    margin: "0 0 10px 0",
-                  }}
-                >
+                <div className="dashboard-card-icon">👥</div>
+                <h2 className="dashboard-card-title">
                   {loading ? "..." : dashboardData.totalUsers}
                 </h2>
-                <p
-                  style={{
-                    fontSize: "1.25rem",
-                    color: "#6b7280",
-                    margin: 0,
-                  }}
-                >
+                <p className="dashboard-card-subtitle">
                   Total Users
                 </p>
               </div>
             </div>
 
             {/* Recent Activity */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "30px",
-              }}
-            >
+            <div className="grid grid-2 gap-5">
               {/* Recent Listings */}
-              <div
-                style={{
-                  backgroundColor: "white",
-                  padding: "30px",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <h3
-                  style={{
-                    fontSize: "1.5rem",
-                    marginBottom: "20px",
-                    color: "#1f2937",
-                  }}
-                >
-                  Recent Listings
-                </h3>
+              <div className="card">
+                <h3 className="card-title">Recent Listings</h3>
                 {dashboardData.recentListings.length > 0 ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "15px",
-                    }}
-                  >
+                  <div className="flex flex-col gap-3">
                     {dashboardData.recentListings.map((listing) => (
                       <div
                         key={listing.id}
-                        style={{
-                          padding: "15px",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: "8px",
-                          backgroundColor: "#f9fafb",
-                        }}
+                        className="dashboard-recent-listing"
                       >
-                        <h4 style={{ margin: "0 0 5px 0", color: "#1f2937" }}>
-                          {listing.title}
-                        </h4>
-                        <p
-                          style={{
-                            margin: "0",
-                            fontSize: "0.875rem",
-                            color: "#6b7280",
-                          }}
-                        >
+                        <h4>{listing.title}</h4>
+                        <p>
                           {listing.location} - Rs{" "}
                           {parseFloat(listing.price).toLocaleString()}
                         </p>
@@ -372,78 +239,32 @@ const AdminDashboard = () => {
                     ))}
                   </div>
                 ) : (
-                  <p style={{ color: "#6b7280" }}>No listings available</p>
+                  <p className="text-secondary">No listings available</p>
                 )}
               </div>
 
               {/* System Info */}
-              <div
-                style={{
-                  backgroundColor: "white",
-                  padding: "30px",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <h3
-                  style={{
-                    fontSize: "1.5rem",
-                    marginBottom: "20px",
-                    color: "#1f2937",
-                  }}
-                >
-                  Quick Actions
-                </h3>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "15px",
-                  }}
-                >
+              <div className="dashboard-quick-action">
+                <h3 className="card-title">Quick Actions</h3>
+                <div className="dashboard-quick-action-buttons">
                   <button
                     onClick={fetchDashboardData}
                     disabled={loading}
-                    style={{
-                      backgroundColor: "#10b981",
-                      color: "white",
-                      padding: "12px 24px",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: loading ? "not-allowed" : "pointer",
-                      fontWeight: "600",
-                      opacity: loading ? 0.6 : 1,
-                    }}
+                    className="btn btn-success"
                   >
                     {loading ? "Refreshing..." : "🔄 Refresh Data"}
                   </button>
 
                   <button
                     onClick={() => navigate("/filter")}
-                    style={{
-                      backgroundColor: "#3b82f6",
-                      color: "white",
-                      padding: "12px 24px",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      fontWeight: "600",
-                    }}
+                    className="btn btn-primary"
                   >
                     🏠 View All Properties
                   </button>
 
                   <button
                     onClick={() => window.open("/", "_blank")}
-                    style={{
-                      backgroundColor: "#f59e0b",
-                      color: "white",
-                      padding: "12px 24px",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      fontWeight: "600",
-                    }}
+                    className="btn btn-warning"
                   >
                     🌐 View Website
                   </button>
@@ -456,68 +277,18 @@ const AdminDashboard = () => {
       case "homepage":
         return (
           <div>
-            <h2
-              style={{
-                fontSize: "2rem",
-                marginBottom: "30px",
-                color: "#1f2937",
-              }}
-            >
-              Homepage Management
-            </h2>
+            <h2 className="card-title">Homepage Management</h2>
 
             {/* Logo Management Section */}
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "30px",
-                borderRadius: "12px",
-                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                marginBottom: "30px",
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "1.5rem",
-                  marginBottom: "20px",
-                  color: "#1f2937",
-                }}
-              >
-                Website Logo
-              </h3>
+            <div className="dashboard-logo-section">
+              <h3 className="card-title">Website Logo</h3>
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "30px",
-                  marginBottom: "30px",
-                }}
-              >
+              <div className="flex gap-5 mb-5">
                 <div>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "10px",
-                      fontWeight: "600",
-                    }}
-                  >
+                  <label className="form-label">
                     Current Logo:
                   </label>
-                  <div
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      border: "2px solid #e5e7eb",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "40px",
-                      backgroundColor: "#f9fafb",
-                      overflow: "hidden",
-                    }}
-                  >
+                  <div className="dashboard-logo-preview">
                     {typeof currentLogo === "string" &&
                     currentLogo.length <= 2 ? (
                       currentLogo
@@ -525,11 +296,6 @@ const AdminDashboard = () => {
                       <img
                         src={currentLogo}
                         alt="Current Logo"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                        }}
                       />
                     )}
                   </div>
@@ -537,50 +303,21 @@ const AdminDashboard = () => {
 
                 {logoPreview && (
                   <div>
-                    <label
-                      style={{
-                        display: "block",
-                        marginBottom: "10px",
-                        fontWeight: "600",
-                      }}
-                    >
+                    <label className="form-label">
                       Preview:
                     </label>
-                    <div
-                      style={{
-                        width: "80px",
-                        height: "80px",
-                        border: "2px solid #3b82f6",
-                        borderRadius: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        overflow: "hidden",
-                      }}
-                    >
+                    <div className="dashboard-logo-preview" style={{ borderColor: '#3b82f6' }}>
                       <img
                         src={logoPreview}
                         alt="Logo Preview"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                        }}
                       />
                     </div>
                   </div>
                 )}
               </div>
 
-              <div style={{ marginBottom: "20px" }}>
-                <label
-                  htmlFor="logoUpload"
-                  style={{
-                    display: "block",
-                    marginBottom: "8px",
-                    fontWeight: "600",
-                  }}
-                >
+              <div className="dashboard-logo-upload">
+                <label htmlFor="logoUpload" className="form-label">
                   Upload New Logo:
                 </label>
                 <input
@@ -588,52 +325,24 @@ const AdminDashboard = () => {
                   id="logoUpload"
                   accept="image/*"
                   onChange={handleLogoUpload}
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    marginBottom: "10px",
-                  }}
+                  className="form-input"
                 />
-                <p
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "#6b7280",
-                    margin: 0,
-                  }}
-                >
+                <p className="text-secondary">
                   Supported formats: JPG, PNG, SVG, GIF (Max size: 2MB)
                 </p>
               </div>
 
               {logoFile && (
-                <div style={{ display: "flex", gap: "15px" }}>
+                <div className="dashboard-logo-actions">
                   <button
                     onClick={handleSaveLogo}
-                    style={{
-                      backgroundColor: "#3b82f6",
-                      color: "white",
-                      padding: "12px 24px",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      fontWeight: "600",
-                    }}
+                    className="btn btn-primary"
                   >
                     Save Logo
                   </button>
                   <button
                     onClick={handleCancelLogo}
-                    style={{
-                      backgroundColor: "#6b7280",
-                      color: "white",
-                      padding: "12px 24px",
-                      border: "none",
-                      borderRadius: "8px",
-                      cursor: "pointer",
-                      fontWeight: "600",
-                    }}
+                    className="btn btn-secondary"
                   >
                     Cancel
                   </button>
@@ -642,87 +351,29 @@ const AdminDashboard = () => {
             </div>
 
             {/* Site Settings */}
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "30px",
-                borderRadius: "12px",
-                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                marginBottom: "30px",
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "1.5rem",
-                  marginBottom: "20px",
-                  color: "#1f2937",
-                }}
-              >
-                Site Information
-              </h3>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "20px",
-                }}
-              >
+            <div className="dashboard-site-info">
+              <h3 className="card-title">Site Information</h3>
+              <div className="dashboard-site-info-grid">
                 <div>
-                  <p>
-                    <strong>Site Name:</strong> GharBazaar
-                  </p>
-                  <p>
-                    <strong>Version:</strong> 1.0.0
-                  </p>
-                  <p>
-                    <strong>Environment:</strong> Development
-                  </p>
+                  <p><strong>Site Name:</strong> GharBazaar</p>
+                  <p><strong>Version:</strong> 1.0.0</p>
+                  <p><strong>Environment:</strong> Development</p>
                 </div>
                 <div>
-                  <p>
-                    <strong>Database:</strong> MySQL
-                  </p>
-                  <p>
-                    <strong>Server:</strong> Node.js
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    <span style={{ color: "#10b981" }}>● Online</span>
-                  </p>
+                  <p><strong>Database:</strong> MySQL</p>
+                  <p><strong>Server:</strong> Node.js</p>
+                  <p><strong>Status:</strong> <span>● Online</span></p>
                 </div>
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div
-              style={{
-                backgroundColor: "white",
-                padding: "30px",
-                borderRadius: "12px",
-                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "1.5rem",
-                  marginBottom: "20px",
-                  color: "#1f2937",
-                }}
-              >
-                Management Actions
-              </h3>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
+            <div className="dashboard-quick-action">
+              <h3 className="card-title">Management Actions</h3>
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => window.open("/", "_blank")}
-                  style={{
-                    backgroundColor: "#f59e0b",
-                    color: "white",
-                    padding: "12px 24px",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                  }}
+                  className="btn btn-warning"
                 >
                   🌐 View Live Site
                 </button>
@@ -730,31 +381,14 @@ const AdminDashboard = () => {
                 <button
                   onClick={fetchDashboardData}
                   disabled={loading}
-                  style={{
-                    backgroundColor: "#10b981",
-                    color: "white",
-                    padding: "12px 24px",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    fontWeight: "600",
-                    opacity: loading ? 0.6 : 1,
-                  }}
+                  className="btn btn-success"
                 >
                   {loading ? "Refreshing..." : "🔄 Refresh Data"}
                 </button>
 
                 <button
                   onClick={() => navigate("/filter")}
-                  style={{
-                    backgroundColor: "#3b82f6",
-                    color: "white",
-                    padding: "12px 24px",
-                    border: "none",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                  }}
+                  className="btn btn-primary"
                 >
                   🏠 Manage Properties
                 </button>
@@ -769,108 +403,36 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: "#f3f4f6",
-      }}
-    >
+    <div className="admin-dashboard">
       {/* Sidebar */}
-      <div
-        style={{
-          width: "280px",
-          backgroundColor: "white",
-          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-          borderRight: "1px solid #e5e7eb",
-        }}
-      >
+      <div className="admin-dashboard-sidebar">
         {/* Admin Header */}
-        <div
-          style={{
-            padding: "30px 20px",
-            borderBottom: "1px solid #e5e7eb",
-            textAlign: "center",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: "1.5rem",
-              color: "#3b82f6",
-              margin: "0 0 10px 0",
-              fontWeight: "bold",
-            }}
-          >
-            GharBazaar Admin
-          </h1>
-          <p
-            style={{
-              color: "#6b7280",
-              fontSize: "0.875rem",
-              margin: 0,
-            }}
-          >
-            Administrative Panel
-          </p>
+        <div className="admin-dashboard-sidebar-header">
+          <h1>GharBazaar Admin</h1>
+          <p>Administrative Panel</p>
         </div>
 
         {/* Navigation Menu */}
-        <nav style={{ padding: "20px 0" }}>
+        <nav className="admin-dashboard-nav">
           <div
             onClick={() => setActiveSection("overview")}
-            style={{
-              padding: "15px 20px",
-              cursor: "pointer",
-              backgroundColor:
-                activeSection === "overview" ? "#f3f4f6" : "transparent",
-              borderLeft:
-                activeSection === "overview"
-                  ? "4px solid #3b82f6"
-                  : "4px solid transparent",
-              color: activeSection === "overview" ? "#3b82f6" : "#1f2937",
-              fontWeight: activeSection === "overview" ? "600" : "normal",
-              transition: "all 0.3s ease",
-            }}
+            className={`admin-dashboard-nav-item ${activeSection === "overview" ? "active" : ""}`}
           >
             📊 Dashboard Overview
           </div>
 
           <div
             onClick={() => setActiveSection("homepage")}
-            style={{
-              padding: "15px 20px",
-              cursor: "pointer",
-              backgroundColor:
-                activeSection === "homepage" ? "#f3f4f6" : "transparent",
-              borderLeft:
-                activeSection === "homepage"
-                  ? "4px solid #3b82f6"
-                  : "4px solid transparent",
-              color: activeSection === "homepage" ? "#3b82f6" : "#1f2937",
-              fontWeight: activeSection === "homepage" ? "600" : "normal",
-              transition: "all 0.3s ease",
-            }}
+            className={`admin-dashboard-nav-item ${activeSection === "homepage" ? "active" : ""}`}
           >
             🏠 Homepage Management
           </div>
         </nav>
 
         {/* Logout Button */}
-        <div style={{ padding: "20px" }}>
+        <div className="admin-dashboard-logout">
           <button
             onClick={handleLogout}
-            style={{
-              width: "100%",
-              backgroundColor: "#dc2626",
-              color: "white",
-              border: "none",
-              fontWeight: "bold",
-              fontSize: "16px",
-              padding: "12px 0",
-              borderRadius: "6px",
-              cursor: "pointer",
-              transition: "background 0.2s",
-            }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = "#b91c1c")}
             onMouseLeave={(e) => (e.target.style.backgroundColor = "#dc2626")}
           >
@@ -880,46 +442,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <div
-        style={{
-          flex: 1,
-          padding: "40px",
-          backgroundColor: "#f3f4f6",
-          overflowY: "auto",
-        }}
-      >
+      <div className="admin-dashboard-content">
         {/* Welcome Header */}
-        <div style={{ marginBottom: "40px" }}>
-          <h1
-            style={{
-              fontSize: "2.5rem",
-              color: "#1f2937",
-              margin: "0 0 10px 0",
-              fontWeight: "bold",
-            }}
-          >
-            Welcome Admin
-          </h1>
-          <p
-            style={{
-              color: "#6b7280",
-              fontSize: "1.125rem",
-              margin: 0,
-            }}
-          >
-            Manage your GharBazaar platform from this dashboard
-          </p>
+        <div className="admin-dashboard-welcome">
+          <h1>Welcome Admin</h1>
+          <p>Manage your GharBazaar platform from this dashboard</p>
         </div>
 
         {/* Dynamic Content */}
-        <div
-          style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            padding: "40px",
-            boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-          }}
-        >
+        <div className="admin-dashboard-section">
           {renderContent()}
         </div>
       </div>
