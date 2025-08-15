@@ -433,63 +433,62 @@ const UserDashboard = () => {
             </p>
           </div>
 
-          <div style={styles.statsContainer}>
-            <div
-              style={styles.statCard}
-              onClick={handleMyListingsClick}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(0, 0, 0, 0.15)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 1px 3px rgba(0, 0, 0, 0.1)";
-              }}
-            >
-              <div style={styles.statNumber}>{stats.activeListings}</div>
-              <div style={styles.statLabel}>Active Listings</div>
-            </div>
-            <div style={styles.statCard}>
-              <div style={styles.statNumber}>{stats.totalViews}</div>
-              <div style={styles.statLabel}>Total Views</div>
-            </div>
-            <div
-              style={styles.statCard}
-              onClick={handleFavoritesClick}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(0, 0, 0, 0.15)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 1px 3px rgba(0, 0, 0, 0.1)";
-              }}
-            >
-              <div style={styles.statNumber}>{stats.savedProperties}</div>
-              <div style={styles.statLabel}>Saved Properties</div>
-            </div>
-            <div
-              style={styles.statCard}
-              onClick={handleViewMessagesClick}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(0, 0, 0, 0.15)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 1px 3px rgba(0, 0, 0, 0.1)";
-              }}
-            >
-              <div style={styles.statNumber}>{stats.messages}</div>
-              <div style={styles.statLabel}>Messages</div>
-            </div>
-          </div>
+<div style={styles.statsContainer}>
+  <div
+    style={styles.statCard}
+    onClick={handleMyListingsClick}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = "translateY(-2px)";
+      e.currentTarget.style.boxShadow =
+        "0 4px 12px rgba(0, 0, 0, 0.15)";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow =
+        "0 1px 3px rgba(0, 0, 0, 0.1)";
+    }}
+  >
+    <div style={styles.statNumber}>{stats.activeListings}</div>
+    <div style={styles.statLabel}>Active Listings</div>
+  </div>
+
+  <div
+    style={styles.statCard}
+    onClick={handleFavoritesClick}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = "translateY(-2px)";
+      e.currentTarget.style.boxShadow =
+        "0 4px 12px rgba(0, 0, 0, 0.15)";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow =
+        "0 1px 3px rgba(0, 0, 0, 0.1)";
+    }}
+  >
+    <div style={styles.statNumber}>{stats.savedProperties}</div>
+    <div style={styles.statLabel}>Saved Properties</div>
+  </div>
+
+  <div
+    style={styles.statCard}
+    onClick={handleViewMessagesClick}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = "translateY(-2px)";
+      e.currentTarget.style.boxShadow =
+        "0 4px 12px rgba(0, 0, 0, 0.15)";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow =
+        "0 1px 3px rgba(0, 0, 0, 0.1)";
+    }}
+  >
+    <div style={styles.statNumber}>{stats.messages}</div>
+    <div style={styles.statLabel}>Messages</div>
+  </div>
+</div>
+
 
           <div style={styles.quickActions}>
             <h3 style={styles.sectionTitle}>Quick Actions</h3>
