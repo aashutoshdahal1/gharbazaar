@@ -193,4 +193,99 @@ router.delete("/users/:id", adminAuth, async (req, res) => {
   }
 });
 
+// POST /api/admin/users - Add a new user (admin only)
+router.post("/users", adminAuth, async (req, res) => {
+  try {
+    const { name, email, password, role = 'user' } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, and password are required",
+      });
+    }
+
+    // Check if email already exists
+    const [existingUsers] = await pool.execute(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "User with this email already exists",
+      });
+    }
+
+    // Hash password using bcryptjs
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert new user
+    const [result] = await pool.execute(
+      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+      [name, email, hashedPassword, role]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      data: {
+        id: result.insertId,
+        name,
+        email,
+        role,
+      },
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to create user",
+      error: error.message,
+    });
+  }
+});
+
+// PUT /api/admin/users/:id - Update user role (admin only)
+router.put("/users/:id", adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!role || !['user', 'admin'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid role (user or admin) is required",
+      });
+    }
+
+    const [result] = await pool.execute(
+      "UPDATE users SET role = ? WHERE id = ?",
+      [role, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "User role updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update user role",
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;

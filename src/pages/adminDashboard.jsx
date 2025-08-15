@@ -18,6 +18,19 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // New state for user and listing management
+  const [users, setUsers] = useState([]);
+  const [listings, setListings] = useState([]);
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'user'
+  });
+  const [userLoading, setUserLoading] = useState(false);
+  const [listingLoading, setListingLoading] = useState(false);
 
   const API_BASE_URL = url + "api";
 
@@ -80,6 +93,174 @@ const AdminDashboard = () => {
     }
   }, [API_BASE_URL]);
 
+  // Fetch all users for admin management
+  const fetchUsers = useCallback(async () => {
+    try {
+      setUserLoading(true);
+      const response = await fetch(`${API_BASE_URL}/admin/users`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setUsers(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setUserLoading(false);
+    }
+  }, [API_BASE_URL]);
+
+  // Fetch all listings for admin management
+  const fetchListings = useCallback(async () => {
+    try {
+      setListingLoading(true);
+      const response = await fetch(`${API_BASE_URL}/admin/properties`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setListings(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching listings:', error);
+    } finally {
+      setListingLoading(false);
+    }
+  }, [API_BASE_URL]);
+
+  // Add new user
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(newUser)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('User created successfully!');
+          setShowAddUserForm(false);
+          setNewUser({ name: '', email: '', password: '', role: 'user' });
+          fetchUsers(); // Refresh user list
+          fetchDashboardData(); // Refresh dashboard stats
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to create user');
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert('Failed to create user');
+    }
+  };
+
+  // Delete user
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user? This will also delete all their listings.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('User deleted successfully!');
+          fetchUsers(); // Refresh user list
+          fetchDashboardData(); // Refresh dashboard stats
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user');
+    }
+  };
+
+  // Delete listing
+  const handleDeleteListing = async (listingId) => {
+    if (!window.confirm('Are you sure you want to delete this listing?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/properties/${listingId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('Listing deleted successfully!');
+          fetchListings(); // Refresh listing list
+          fetchDashboardData(); // Refresh dashboard stats
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to delete listing');
+      }
+    } catch (error) {
+      console.error('Error deleting listing:', error);
+      alert('Failed to delete listing');
+    }
+  };
+
+  // Update user role
+  const handleUpdateUserRole = async (userId, newRole) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ role: newRole })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('User role updated successfully!');
+          fetchUsers(); // Refresh user list
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to update user role');
+      }
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      alert('Failed to update user role');
+    }
+  };
+
   useEffect(() => {
     // Check if admin is logged in
     const adminToken = localStorage.getItem("adminToken");
@@ -90,7 +271,10 @@ const AdminDashboard = () => {
 
     // Fetch dashboard data
     fetchDashboardData();
-  }, [navigate, fetchDashboardData]);
+    // Fetch users and listings for management
+    fetchUsers();
+    fetchListings();
+  }, [navigate, fetchDashboardData, fetchUsers, fetchListings]);
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -350,49 +534,192 @@ const AdminDashboard = () => {
               )}
             </div>
 
-            {/* Site Settings */}
-            <div className="dashboard-site-info">
-              <h3 className="card-title">Site Information</h3>
-              <div className="dashboard-site-info-grid">
-                <div>
-                  <p><strong>Site Name:</strong> GharBazaar</p>
-                  <p><strong>Version:</strong> 1.0.0</p>
-                  <p><strong>Environment:</strong> Development</p>
-                </div>
-                <div>
-                  <p><strong>Database:</strong> MySQL</p>
-                  <p><strong>Server:</strong> Node.js</p>
-                  <p><strong>Status:</strong> <span>● Online</span></p>
-                </div>
-              </div>
+          </div>
+        );
+
+      case "users":
+        return (
+          <div className="admin-dashboard-section">
+            <div className="flex justify-between items-center mb-5">
+              <h2 className="card-title">User Management</h2>
+              <button
+                onClick={() => setShowAddUserForm(!showAddUserForm)}
+                className="btn btn-primary"
+              >
+                {showAddUserForm ? 'Cancel' : '➕ Add New User'}
+              </button>
             </div>
 
-            {/* Quick Actions */}
-            <div className="dashboard-quick-action">
-              <h3 className="card-title">Management Actions</h3>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => window.open("/", "_blank")}
-                  className="btn btn-warning"
-                >
-                  🌐 View Live Site
-                </button>
-
-                <button
-                  onClick={fetchDashboardData}
-                  disabled={loading}
-                  className="btn btn-success"
-                >
-                  {loading ? "Refreshing..." : "🔄 Refresh Data"}
-                </button>
-
-                <button
-                  onClick={() => navigate("/filter")}
-                  className="btn btn-primary"
-                >
-                  🏠 Manage Properties
-                </button>
+            {/* Add User Form */}
+            {showAddUserForm && (
+              <div className="card mb-5">
+                <h3 className="card-title">Add New User</h3>
+                <form onSubmit={handleAddUser} className="admin-form">
+                  <div className="form-group">
+                    <label htmlFor="name" className="form-label">Name:</label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={newUser.name}
+                      onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="email" className="form-label">Email:</label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="password" className="form-label">Password:</label>
+                    <input
+                      type="password"
+                      id="password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="role" className="form-label">Role:</label>
+                    <select
+                      id="role"
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                      className="form-input"
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  
+                  <button type="submit" className="btn btn-success">
+                    Create User
+                  </button>
+                </form>
               </div>
+            )}
+
+            {/* Users List */}
+            <div className="card">
+              <h3 className="card-title">All Users ({users.length})</h3>
+              {userLoading ? (
+                <p>Loading users...</p>
+              ) : users.length > 0 ? (
+                <div className="admin-table-container">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((user) => (
+                        <tr key={user.id}>
+                          <td>{user.id}</td>
+                          <td>{user.name}</td>
+                          <td>{user.email}</td>
+                          <td>
+                            <select
+                              value={user.role}
+                              onChange={(e) => handleUpdateUserRole(user.id, e.target.value)}
+                              className="form-select-small"
+                            >
+                              <option value="user">User</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          </td>
+                          <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                          <td>
+                            <button
+                              onClick={() => handleDeleteUser(user.id)}
+                              className="btn btn-danger btn-small"
+                              disabled={user.role === 'admin'}
+                            >
+                              🗑️ Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-secondary">No users found</p>
+              )}
+            </div>
+          </div>
+        );
+
+      case "listings":
+        return (
+          <div className="admin-dashboard-section">
+            <h2 className="card-title">Listing Management</h2>
+            
+            {/* Listings List */}
+            <div className="card">
+              <h3 className="card-title">All Listings ({listings.length})</h3>
+              {listingLoading ? (
+                <p>Loading listings...</p>
+              ) : listings.length > 0 ? (
+                <div className="admin-table-container">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Owner</th>
+                        <th>Type</th>
+                        <th>Purpose</th>
+                        <th>Price</th>
+                        <th>Location</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listings.map((listing) => (
+                        <tr key={listing.id}>
+                          <td>{listing.id}</td>
+                          <td>{listing.title}</td>
+                          <td>{listing.owner_name || 'Unknown'}</td>
+                          <td>{listing.property_type}</td>
+                          <td>{listing.purpose}</td>
+                          <td>Rs {parseFloat(listing.price).toLocaleString()}</td>
+                          <td>{listing.location}</td>
+                          <td>{new Date(listing.created_at).toLocaleDateString()}</td>
+                          <td>
+                            <button
+                              onClick={() => handleDeleteListing(listing.id)}
+                              className="btn btn-danger btn-small"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-secondary">No listings found</p>
+              )}
             </div>
           </div>
         );
@@ -426,6 +753,20 @@ const AdminDashboard = () => {
             className={`admin-dashboard-nav-item ${activeSection === "homepage" ? "active" : ""}`}
           >
             🏠 Homepage Management
+          </div>
+
+          <div
+            onClick={() => setActiveSection("users")}
+            className={`admin-dashboard-nav-item ${activeSection === "users" ? "active" : ""}`}
+          >
+            👥 User Management
+          </div>
+
+          <div
+            onClick={() => setActiveSection("listings")}
+            className={`admin-dashboard-nav-item ${activeSection === "listings" ? "active" : ""}`}
+          >
+            🏘️ Listing Management
           </div>
         </nav>
 
