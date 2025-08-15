@@ -985,75 +985,6 @@ export default function GharBazaarHomepage() {
               connect property seekers with their dream properties across the
               beautiful landscapes of Nepal.
             </p>
-            <div style={styles.footerSocialSection}>
-              <h4 style={styles.footerSubtitle}>Follow Us</h4>
-              <div style={styles.socialLinks}>
-                <a
-                  href="#"
-                  style={styles.socialLink}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "#3b82f6";
-                    e.target.style.color = "white";
-                    e.target.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
-                    e.target.style.color = "#3b82f6";
-                    e.target.style.transform = "translateY(0)";
-                  }}
-                >
-                  📘
-                </a>
-                <a
-                  href="#"
-                  style={styles.socialLink}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "#3b82f6";
-                    e.target.style.color = "white";
-                    e.target.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
-                    e.target.style.color = "#3b82f6";
-                    e.target.style.transform = "translateY(0)";
-                  }}
-                >
-                  🐦
-                </a>
-                <a
-                  href="#"
-                  style={styles.socialLink}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "#3b82f6";
-                    e.target.style.color = "white";
-                    e.target.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
-                    e.target.style.color = "#3b82f6";
-                    e.target.style.transform = "translateY(0)";
-                  }}
-                >
-                  📸
-                </a>
-                <a
-                  href="#"
-                  style={styles.socialLink}
-                  onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "#3b82f6";
-                    e.target.style.color = "white";
-                    e.target.style.transform = "translateY(-2px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "rgba(59, 130, 246, 0.1)";
-                    e.target.style.color = "#3b82f6";
-                    e.target.style.transform = "translateY(0)";
-                  }}
-                >
-                  💼
-                </a>
-              </div>
-            </div>
           </div>
           <div style={styles.footerSection}>
             <h4 style={styles.footerSubtitle}>Quick Links</h4>
@@ -1212,9 +1143,7 @@ export default function GharBazaarHomepage() {
           </div>
         </div>
         <div style={styles.footerBottom}>
-          <p>
-            &copy; 2025 GharBazaar. All rights reserved. | Made with ❤️ in Nepal
-          </p>
+          <p>&copy; 2025 GharBazaar. All rights reserved.</p>
         </div>
       </footer>
     </div>
