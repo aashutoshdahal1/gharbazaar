@@ -1095,7 +1095,7 @@ export default function GharBazaarHomepage() {
               </li>
               <li style={styles.footerListItem}>
                 <a
-                  href="#"
+                  href="help"
                   style={styles.footerLink}
                   onMouseEnter={(e) => {
                     e.target.style.color = "#3b82f6";

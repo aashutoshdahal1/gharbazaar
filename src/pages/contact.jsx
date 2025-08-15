@@ -1,6 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
+
+  // Helper function to get initials from name
+  const getInitials = (name) => {
+    return name.split(' ').map(word => word[0]).join('').toUpperCase();
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Basic form validation
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      setSubmitMessage('Please fill in all fields');
+      setMessageType('error');
+      return;
+    }
+
+    // Simulate form submission
+    console.log('Form submitted:', formData);
+    setSubmitMessage('Thank you for your message! We\'ll get back to you soon.');
+    setMessageType('success');
+    
+    // Reset form
+    setFormData({
+      name: '',
+      email: '',
+      subject: '',
+      message: ''
+    });
+
+    // Clear message after 5 seconds
+    setTimeout(() => {
+      setSubmitMessage('');
+      setMessageType('');
+    }, 5000);
+  };
+
+  const teamMembers = [
+    { name: "Aashutosh Dahal", role: "Developer", email: "aashutosh@gmail.com", phone: "9866666666" },
+    { name: "Arush Pradhan", role: "Developer", email: "arush@gmail.com", phone: "9867777777" },
+    { name: "Amit Saini", role: "Developer", email: "amit@gmail.com", phone: "9868888888" },
+    { name: "Gurash Subedi", role: "Developer", email: "gurash@gmail.com", phone: "9869999999" },
+    { name: "Lukesh Raj Jyoti", role: "Developer", email: "lukesh@gmail.com", phone: "9865555555" }
+  ];
+
   return (
     <div className="page-container">
       <header className="page-header">
@@ -8,18 +66,18 @@ const Contact = () => {
         <p>Get in touch with our team for any inquiries, support, or collaboration opportunities</p>
       </header>
 
-      <section className="card">
+      <section className="card contact-info-section">
         <h2 className="card-title">Our Contact Information</h2>
         <p className="card-subtitle">
           Reach out to us via the details below or connect with individual team members.
         </p>
-        <div className="grid grid-2 mt-4">
-          <div>
+        <div className="contact-info-grid">
+          <div className="contact-info-item">
             <h3 className="font-weight-600 mb-2">General Inquiries</h3>
             <p>Email: info@gharbazaar.com</p>
             <p>Phone: +977-1-1234567</p>
           </div>
-          <div>
+          <div className="contact-info-item">
             <h3 className="font-weight-600 mb-2">Address</h3>
             <p>GharBazaar Headquarters</p>
             <p>Kathmandu, Nepal</p>
@@ -28,70 +86,101 @@ const Contact = () => {
         </div>
       </section>
 
-      <section className="card mt-4">
+      <section className="card contact-team-section mt-4">
         <h2 className="card-title">Our Team</h2>
         <p className="card-subtitle">
           Connect directly with our developers for technical questions or feedback.
         </p>
-        <div className="grid grid-3 mt-4">
-          <div className="team-member">
-            <h3 className="team-member-name">Aashutosh Dahal</h3>
-            <p className="team-member-role">Developer</p>
-            <p>Email: aashutosh@gmail.com</p>
-            <p>Phone: 9866666666</p>
-          </div>
-          <div className="team-member">
-            <h3 className="team-member-name">Arush Pradhan</h3>
-            <p className="team-member-role">Developer</p>
-            <p>Email: arush@gmail.com</p>
-            <p>Phone: 9867777777</p>
-          </div>
-          <div className="team-member">
-            <h3 className="team-member-name">Amit Saini</h3>
-            <p className="team-member-role">Developer</p>
-            <p>Email: amit@gmail.com</p>
-            <p>Phone: 9868888888</p>
-          </div>
-          <div className="team-member">
-            <h3 className="team-member-name">Gurash Subedi</h3>
-            <p className="team-member-role">Developer</p>
-            <p>Email: gurash@gmail.com</p>
-            <p>Phone: 9869999999</p>
-          </div>
-          <div className="team-member">
-            <h3 className="team-member-name">Lukesh Raj Jyoti</h3>
-            <p className="team-member-role">Developer</p>
-            <p>Email: lukesh@gmail.com</p>
-            <p>Phone: 9865555555</p>
-          </div>
+        <div className="contact-team-grid">
+          {teamMembers.map((member, index) => (
+            <div key={index} className="contact-team-member">
+              <div className="contact-team-member-avatar">
+                {getInitials(member.name)}
+              </div>
+              <h3 className="contact-team-member-name">{member.name}</h3>
+              <p className="contact-team-member-role">{member.role}</p>
+              <div className="contact-team-member-details">
+                <p>Email: {member.email}</p>
+                <p>Phone: {member.phone}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="card mt-4">
+      <section className="card contact-form-section mt-4">
         <h2 className="card-title">Send Us a Message</h2>
         <p className="card-subtitle">
           Fill out the form below, and we'll get back to you as soon as possible.
         </p>
-        <form className="form mt-4">
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label" htmlFor="name">Your Name</label>
-              <input type="text" id="name" className="form-input" placeholder="Enter your name" />
+        
+        {submitMessage && (
+          <div className={`contact-message contact-message-${messageType}`}>
+            {submitMessage}
+          </div>
+        )}
+
+        <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="contact-form-row">
+            <div className="contact-form-group">
+              <label className="contact-form-label" htmlFor="name">Your Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="contact-form-input"
+                placeholder="Enter your name"
+                required
+              />
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Your Email</label>
-              <input type="email" id="email" className="form-input" placeholder="Enter your email" />
+            <div className="contact-form-group">
+              <label className="contact-form-label" htmlFor="email">Your Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="contact-form-input"
+                placeholder="Enter your email"
+                required
+              />
             </div>
           </div>
-          <div className="form-group mt-3">
-            <label className="form-label" htmlFor="subject">Subject</label>
-            <input type="text" id="subject" className="form-input" placeholder="Enter subject" />
+          <div className="contact-form-row contact-form-row-single">
+            <div className="contact-form-group">
+              <label className="contact-form-label" htmlFor="subject">Subject</label>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                className="contact-form-input"
+                placeholder="Enter subject"
+                required
+              />
+            </div>
           </div>
-          <div className="form-group mt-3">
-            <label className="form-label" htmlFor="message">Message</label>
-            <textarea id="message" className="form-textarea" placeholder="Enter your message"></textarea>
+          <div className="contact-form-row contact-form-row-single">
+            <div className="contact-form-group">
+              <label className="contact-form-label" htmlFor="message">Message</label>
+              <textarea
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                className="contact-form-textarea"
+                placeholder="Enter your message"
+                required
+              ></textarea>
+            </div>
           </div>
-          <button type="submit" className="btn btn-primary mt-4">Send Message</button>
+          <button type="submit" className="contact-form-button">
+            Send Message
+          </button>
         </form>
       </section>
     </div>
