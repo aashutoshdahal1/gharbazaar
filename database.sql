@@ -87,3 +87,11 @@ CREATE TABLE search_logs (
   searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+-- Insert default admin user
+-- Password is 'admin123' (hashed with bcrypt)
+INSERT INTO users (name, email, password, role) VALUES 
+('Admin User', 'admin@gharbazaar.com', '$2b$10$dow6q2fhX0qqUv.OOvzhdOVC0qZvpAOxBwmqy7A/zP.i8l5Kh2uEq', 'admin')
+ON DUPLICATE KEY UPDATE 
+name = VALUES(name), 
+role = VALUES(role);

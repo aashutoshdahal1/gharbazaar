@@ -54,6 +54,9 @@ async function setupDatabase() {
 
       // Check and add missing columns
       await ensureRequiredColumns(connection);
+
+      // Ensure admin user exists
+      await ensureAdminUser(connection);
     } else {
       console.error("❌ SQL file not found:", sqlFilePath);
     }
@@ -129,4 +132,42 @@ async function ensureRequiredColumns(connection) {
     console.error("❌ Error checking columns:", error.message);
   }
 }
+
+async function ensureAdminUser(connection) {
+  console.log("👑 Ensuring admin user exists...");
+
+  try {
+    const adminEmail = "admin@gharbazaar.com";
+
+    // Check if admin already exists
+    const [existingAdmin] = await connection.execute(
+      "SELECT id FROM users WHERE email = ? AND role = 'admin'",
+      [adminEmail]
+    );
+
+    if (existingAdmin.length > 0) {
+      console.log("✅ Admin user already exists");
+      return;
+    }
+
+    // Create admin user
+    const bcrypt = require("bcryptjs");
+    const adminPassword = "admin123";
+    const adminName = "Admin User";
+
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+
+    await connection.execute(
+      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+      [adminName, adminEmail, hashedPassword, "admin"]
+    );
+
+    console.log("✅ Admin user created successfully");
+    console.log(`   Email: ${adminEmail}`);
+    console.log(`   Password: ${adminPassword}`);
+  } catch (error) {
+    console.error("❌ Error ensuring admin user:", error.message);
+  }
+}
+
 module.exports = setupDatabase;

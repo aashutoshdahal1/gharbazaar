@@ -1,23 +1,45 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const { pool } = require("../config/db");
 const router = express.Router();
 
 // Admin middleware to check if user is admin
-const adminAuth = (req, res, next) => {
-  // For now, we'll use a simple check
-  // In production, you'd verify JWT token and check admin role
-  const adminToken = req.headers.authorization?.split(" ")[1];
+const adminAuth = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
 
-  if (!adminToken) {
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "No admin token provided",
+      });
+    }
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Check if user exists and is admin
+    const [users] = await pool.execute(
+      "SELECT id, name, email, role FROM users WHERE id = ? AND role = 'admin'",
+      [decoded.id]
+    );
+
+    if (users.length === 0) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin role required.",
+      });
+    }
+
+    req.user = users[0];
+    next();
+  } catch (error) {
+    console.error("Admin auth error:", error);
     return res.status(401).json({
       success: false,
-      message: "No admin token provided",
+      message: "Invalid admin token",
     });
   }
-
-  // For demo purposes, we'll allow any token
-  // In production, verify JWT and check admin role from database
-  next();
 };
 
 // GET /api/admin/users - Get all users for admin dashboard
@@ -196,7 +218,7 @@ router.delete("/users/:id", adminAuth, async (req, res) => {
 // POST /api/admin/users - Add a new user (admin only)
 router.post("/users", adminAuth, async (req, res) => {
   try {
-    const { name, email, password, role = 'user' } = req.body;
+    const { name, email, password, role = "user" } = req.body;
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -220,7 +242,7 @@ router.post("/users", adminAuth, async (req, res) => {
     }
 
     // Hash password using bcryptjs
-    const bcrypt = require('bcryptjs');
+    const bcrypt = require("bcryptjs");
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert new user
@@ -255,7 +277,7 @@ router.put("/users/:id", adminAuth, async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
 
-    if (!role || !['user', 'admin'].includes(role)) {
+    if (!role || !["user", "admin"].includes(role)) {
       return res.status(400).json({
         success: false,
         message: "Valid role (user or admin) is required",

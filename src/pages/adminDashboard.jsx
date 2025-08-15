@@ -31,6 +31,17 @@ const AdminDashboard = () => {
   });
   const [userLoading, setUserLoading] = useState(false);
   const [listingLoading, setListingLoading] = useState(false);
+  
+  // Current admin user state
+  const [currentAdmin, setCurrentAdmin] = useState(null);
+  
+  // Password change state
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   const API_BASE_URL = url + "api";
 
@@ -107,6 +118,14 @@ const AdminDashboard = () => {
         const data = await response.json();
         if (data.success) {
           setUsers(data.data);
+          // Set current admin user if they are in the list
+          const adminToken = localStorage.getItem('adminToken');
+          if (adminToken) {
+            const currentUser = data.data.find(user => user.token === adminToken);
+            if (currentUser) {
+              setCurrentAdmin(currentUser);
+            }
+          }
         }
       }
     } catch (error) {
@@ -235,6 +254,12 @@ const AdminDashboard = () => {
 
   // Update user role
   const handleUpdateUserRole = async (userId, newRole) => {
+    // Prevent changing own role
+    if (userId === currentAdmin?.id) {
+      alert('You cannot change your own role.');
+      return;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
         method: 'PUT',
@@ -261,12 +286,67 @@ const AdminDashboard = () => {
     }
   };
 
+  // Change admin password
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert('New passwords do not match!');
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      alert('New password must be at least 6 characters long!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('Password changed successfully!');
+          setShowChangePassword(false);
+          setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      alert('Failed to change password');
+    }
+  };
+
   useEffect(() => {
     // Check if admin is logged in
     const adminToken = localStorage.getItem("adminToken");
     if (!adminToken) {
       navigate("/admin");
       return;
+    }
+
+    // Load current admin user info
+    const adminUserStr = localStorage.getItem("adminUser");
+    if (adminUserStr) {
+      try {
+        const adminUser = JSON.parse(adminUserStr);
+        setCurrentAdmin(adminUser);
+      } catch (error) {
+        console.error("Error parsing admin user data:", error);
+      }
     }
 
     // Fetch dashboard data
@@ -278,6 +358,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
     navigate("/admin");
   };
 
@@ -550,6 +631,24 @@ const AdminDashboard = () => {
               </button>
             </div>
 
+            {/* Current Admin Info */}
+            {currentAdmin && (
+              <div className="card mb-5" style={{ backgroundColor: 'var(--bg-light)', border: '2px solid var(--primary-color)' }}>
+                <h3 className="card-title">👑 Current Admin User</h3>
+                <div className="flex gap-4 items-center">
+                  <div>
+                    <p><strong>Name:</strong> {currentAdmin.name}</p>
+                    <p><strong>Email:</strong> {currentAdmin.email}</p>
+                    <p><strong>Role:</strong> <span style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>{currentAdmin.role}</span></p>
+                  </div>
+                  <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                    <p>• You cannot change your own role</p>
+                    <p>• You cannot delete your own account</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Add User Form */}
             {showAddUserForm && (
               <div className="card mb-5">
@@ -631,26 +730,35 @@ const AdminDashboard = () => {
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user.id}>
+                        <tr key={user.id} className={user.id === currentAdmin?.id ? 'current-admin-row' : ''}>
                           <td>{user.id}</td>
-                          <td>{user.name}</td>
+                          <td>
+                            {user.name}
+                            {user.id === currentAdmin?.id && <span style={{ color: 'var(--primary-color)', marginLeft: '8px' }}>👑</span>}
+                          </td>
                           <td>{user.email}</td>
                           <td>
                             <select
                               value={user.role}
                               onChange={(e) => handleUpdateUserRole(user.id, e.target.value)}
                               className="form-select-small"
+                              disabled={user.id === currentAdmin?.id}
                             >
                               <option value="user">User</option>
                               <option value="admin">Admin</option>
                             </select>
+                            {user.id === currentAdmin?.id && (
+                              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginLeft: '4px' }}>
+                                (Current)
+                              </span>
+                            )}
                           </td>
                           <td>{new Date(user.created_at).toLocaleDateString()}</td>
                           <td>
                             <button
                               onClick={() => handleDeleteUser(user.id)}
                               className="btn btn-danger btn-small"
-                              disabled={user.role === 'admin'}
+                              disabled={user.role === 'admin' || user.id === currentAdmin?.id}
                             >
                               🗑️ Delete
                             </button>
@@ -786,7 +894,7 @@ const AdminDashboard = () => {
       <div className="admin-dashboard-content">
         {/* Welcome Header */}
         <div className="admin-dashboard-welcome">
-          <h1>Welcome Admin</h1>
+          <h1>Welcome {currentAdmin?.name || 'Admin'}</h1>
           <p>Manage your GharBazaar platform from this dashboard</p>
         </div>
 
