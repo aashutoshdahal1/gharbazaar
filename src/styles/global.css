@@ -1170,6 +1170,10 @@ body {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .dashboard-recent-listing {
   padding: 1rem;
   border: 1px solid var(--border-light);
@@ -1464,6 +1468,10 @@ body {
   }
   
   .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-4 {
     grid-template-columns: 1fr;
   }
   
@@ -2483,5 +2491,61 @@ body {
   .contact-team-member {
     padding: var(--space-lg);
   }
+}
+ 
+.current-admin-row:hover {
+  background-color: rgba(52, 152, 219, 0.15) !important;
+}
+
+/* Contact Submission Styles */
+.contact-submission-row {
+  transition: var(--transition-normal);
+}
+
+.contact-submission-row.status-new {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left: 4px solid var(--primary-color);
+}
+
+.contact-submission-row.status-read {
+  background-color: rgba(255, 193, 7, 0.1);
+  border-left: 4px solid var(--warning-color);
+}
+
+.contact-submission-row.status-replied {
+  background-color: rgba(40, 167, 69, 0.1);
+  border-left: 4px solid var(--success-color);
+}
+
+.contact-submission-row.status-closed {
+  background-color: rgba(108, 117, 125, 0.1);
+  border-left: 4px solid var(--secondary-color);
+}
+
+.message-preview {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-new {
+  color: var(--primary-color);
+  font-weight: var(--font-semibold);
+}
+
+.status-read {
+  color: var(--warning-color);
+  font-weight: var(--font-semibold);
+}
+
+.status-replied {
+  color: var(--success-color);
+  font-weight: var(--font-semibold);
+}
+
+.status-closed {
+  color: var(--secondary-color);
+  font-weight: var(--font-semibold);
 }
  

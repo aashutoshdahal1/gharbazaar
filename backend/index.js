@@ -10,6 +10,7 @@ const authRoutes = require("./routes/auth");
 const propertyRoutes = require("./routes/properties");
 const messageRoutes = require("./routes/messages");
 const adminRoutes = require("./routes/admin");
+const contactRoutes = require("./routes/contact");
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -24,6 +25,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/contact", contactRoutes);
 
 // ✅ Ensure DB is created before server starts
 async function startServer() {

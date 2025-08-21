@@ -42,6 +42,10 @@ const AdminDashboard = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  
+  // Contact submissions state
+  const [contactSubmissions, setContactSubmissions] = useState([]);
+  const [contactLoading, setContactLoading] = useState(false);
 
   const API_BASE_URL = url + "api";
 
@@ -155,6 +159,29 @@ const AdminDashboard = () => {
       console.error('Error fetching listings:', error);
     } finally {
       setListingLoading(false);
+    }
+  }, [API_BASE_URL]);
+
+  // Fetch all contact submissions for admin management
+  const fetchContactSubmissions = useCallback(async () => {
+    try {
+      setContactLoading(true);
+      const response = await fetch(`${API_BASE_URL}/contact/submissions`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setContactSubmissions(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching contact submissions:', error);
+    } finally {
+      setContactLoading(false);
     }
   }, [API_BASE_URL]);
 
@@ -286,6 +313,64 @@ const AdminDashboard = () => {
     }
   };
 
+  // Update contact submission status
+  const handleUpdateContactStatus = async (submissionId, newStatus) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/contact/submissions/${submissionId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('Status updated successfully!');
+          fetchContactSubmissions(); // Refresh contact submissions
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to update status');
+      }
+    } catch (error) {
+      console.error('Error updating contact status:', error);
+      alert('Failed to update status');
+    }
+  };
+
+  // Delete contact submission
+  const handleDeleteContactSubmission = async (submissionId) => {
+    if (!window.confirm('Are you sure you want to delete this contact submission?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/contact/submissions/${submissionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          alert('Contact submission deleted successfully!');
+          fetchContactSubmissions(); // Refresh contact submissions
+        }
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || 'Failed to delete contact submission');
+      }
+    } catch (error) {
+      console.error('Error deleting contact submission:', error);
+      alert('Failed to delete contact submission');
+    }
+  };
+
   // Change admin password
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -354,7 +439,9 @@ const AdminDashboard = () => {
     // Fetch users and listings for management
     fetchUsers();
     fetchListings();
-  }, [navigate, fetchDashboardData, fetchUsers, fetchListings]);
+    // Fetch contact submissions for management
+    fetchContactSubmissions();
+  }, [navigate, fetchDashboardData, fetchUsers, fetchListings, fetchContactSubmissions]);
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -453,7 +540,7 @@ const AdminDashboard = () => {
             )}
 
             {/* Stats Cards */}
-            <div className="grid grid-2 gap-5 mb-5">
+            <div className="grid grid-4 gap-5 mb-5">
               {/* Total Listings Card */}
               <div
                 onClick={handleTotalListingsClick}
@@ -479,6 +566,34 @@ const AdminDashboard = () => {
                 </h2>
                 <p className="dashboard-card-subtitle">
                   Total Users
+                </p>
+              </div>
+
+              {/* Contact Submissions Card */}
+              <div
+                onClick={() => setActiveSection("contacts")}
+                className="dashboard-card"
+              >
+                <div className="dashboard-card-icon">📧</div>
+                <h2 className="dashboard-card-title">
+                  {contactLoading ? "..." : contactSubmissions.length}
+                </h2>
+                <p className="dashboard-card-subtitle">
+                  Contact Submissions
+                </p>
+              </div>
+
+              {/* New Contact Submissions Card */}
+              <div
+                onClick={() => setActiveSection("contacts")}
+                className="dashboard-card"
+              >
+                <div className="dashboard-card-icon">🆕</div>
+                <h2 className="dashboard-card-title">
+                  {loading ? "..." : contactSubmissions.filter(s => s.status === 'new').length}
+                </h2>
+                <p className="dashboard-card-subtitle">
+                  New Messages
                 </p>
               </div>
             </div>
@@ -832,6 +947,79 @@ const AdminDashboard = () => {
           </div>
         );
 
+      case "contacts":
+        return (
+          <div className="admin-dashboard-section">
+            <h2 className="card-title">Contact Submissions Management</h2>
+            
+            {/* Contact Submissions List */}
+            <div className="card">
+              <h3 className="card-title">All Contact Submissions ({contactSubmissions.length})</h3>
+              {contactLoading ? (
+                <p>Loading contact submissions...</p>
+              ) : contactSubmissions.length > 0 ? (
+                <div className="admin-table-container">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contactSubmissions.map((submission) => (
+                        <tr key={submission.id} className={`contact-submission-row status-${submission.status}`}>
+                          <td>{submission.id}</td>
+                          <td>{submission.name}</td>
+                          <td>{submission.email}</td>
+                          <td>{submission.subject}</td>
+                          <td>
+                            <div className="message-preview">
+                              {submission.message.length > 50 
+                                ? `${submission.message.substring(0, 50)}...` 
+                                : submission.message
+                              }
+                            </div>
+                          </td>
+                          <td>
+                            <select
+                              value={submission.status}
+                              onChange={(e) => handleUpdateContactStatus(submission.id, e.target.value)}
+                              className={`form-select-small status-${submission.status}`}
+                            >
+                              <option value="new">New</option>
+                              <option value="read">Read</option>
+                              <option value="replied">Replied</option>
+                              <option value="closed">Closed</option>
+                            </select>
+                          </td>
+                          <td>{new Date(submission.created_at).toLocaleDateString()}</td>
+                          <td>
+                            <button
+                              onClick={() => handleDeleteContactSubmission(submission.id)}
+                              className="btn btn-danger btn-small"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-secondary">No contact submissions found</p>
+              )}
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -875,6 +1063,13 @@ const AdminDashboard = () => {
             className={`admin-dashboard-nav-item ${activeSection === "listings" ? "active" : ""}`}
           >
             🏘️ Listing Management
+          </div>
+
+          <div
+            onClick={() => setActiveSection("contacts")}
+            className={`admin-dashboard-nav-item ${activeSection === "contacts" ? "active" : ""}`}
+          >
+            📧 Contact Submissions
           </div>
         </nav>
 
