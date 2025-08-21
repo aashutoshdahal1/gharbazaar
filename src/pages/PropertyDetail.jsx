@@ -727,12 +727,11 @@ const PropertyDetail = () => {
                           <span
                             key={star}
                             style={{
-                              color:
-                                star <= averageRating ? "#fbbf24" : "#d1d5db",
+                              color: "#fbbf24",
                               fontSize: "16px",
                             }}
                           >
-                            ⭐
+                            {star <= averageRating ? "★" : "☆"}
                           </span>
                         ))}
                       </div>
@@ -793,14 +792,11 @@ const PropertyDetail = () => {
                           <span
                             key={star}
                             style={{
-                              color:
-                                star <= userReview.rating
-                                  ? "#fbbf24"
-                                  : "#d1d5db",
+                              color: "#fbbf24",
                               fontSize: "14px",
                             }}
                           >
-                            ⭐
+                            {star <= userReview.rating ? "★" : "☆"}
                           </span>
                         ))}
                       </div>
@@ -874,14 +870,11 @@ const PropertyDetail = () => {
                                 <span
                                   key={star}
                                   style={{
-                                    color:
-                                      star <= review.rating
-                                        ? "#fbbf24"
-                                        : "#d1d5db",
+                                    color: "#fbbf24",
                                     fontSize: "12px",
                                   }}
                                 >
-                                  ⭐
+                                  {star <= review.rating ? "★" : "☆"}
                                 </span>
                               ))}
                             </div>
@@ -984,9 +977,7 @@ const PropertyDetail = () => {
                     key={star}
                     type="button"
                     onClick={(e) => {
-                      e.preventDefault();
                       e.stopPropagation();
-                      console.log(`Setting rating to ${star}`); // Debug log
                       setRating(star);
                     }}
                     onMouseEnter={(e) => {
@@ -1000,7 +991,7 @@ const PropertyDetail = () => {
                       border: "none",
                       fontSize: "28px",
                       cursor: "pointer",
-                      color: star <= rating ? "#fbbf24" : "#d1d5db",
+                      color: "#fbbf24",
                       padding: "4px",
                       borderRadius: "4px",
                       transition: "all 0.2s ease",
@@ -1008,7 +999,7 @@ const PropertyDetail = () => {
                     }}
                     title={`Rate ${star} star${star > 1 ? "s" : ""}`}
                   >
-                    ⭐
+                    {star <= rating ? "★" : "☆"}
                   </button>
                 ))}
               </div>
