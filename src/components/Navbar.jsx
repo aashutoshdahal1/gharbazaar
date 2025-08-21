@@ -156,55 +156,85 @@ const Navbar = ({
         <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
           {/* Message Icon for logged-in users */}
           {isLoggedIn && (
-            <div
-              style={{
-                position: "relative",
-                cursor: "pointer",
-                padding: "8px",
-                borderRadius: "50%",
-                backgroundColor: "#f3f4f6",
-                transition: "all 0.2s ease",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "2px solid transparent",
-              }}
-              onClick={() => navigate("/messages")}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#e5e7eb";
-                e.currentTarget.style.borderColor = "#2563eb";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#f3f4f6";
-                e.currentTarget.style.borderColor = "transparent";
-              }}
-            >
-              <span style={{ fontSize: "20px" }}>💬</span>
-              {unreadCount > 0 && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "-2px",
-                    right: "-2px",
-                    backgroundColor: "#ef4444",
-                    color: "white",
-                    borderRadius: "50%",
-                    minWidth: "20px",
-                    height: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "11px",
-                    fontWeight: "700",
-                    padding: "2px 4px",
-                    border: "2px solid white",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-            </div>
+            <>
+              <div
+                style={{
+                  position: "relative",
+                  cursor: "pointer",
+                  padding: "8px",
+                  borderRadius: "50%",
+                  backgroundColor: "#f3f4f6",
+                  transition: "all 0.2s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "2px solid transparent",
+                }}
+                onClick={() => navigate("/messages")}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#e5e7eb";
+                  e.currentTarget.style.borderColor = "#2563eb";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f3f4f6";
+                  e.currentTarget.style.borderColor = "transparent";
+                }}
+                title="Messages"
+              >
+                <span style={{ fontSize: "20px" }}>💬</span>
+                {unreadCount > 0 && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "-2px",
+                      right: "-2px",
+                      backgroundColor: "#ef4444",
+                      color: "white",
+                      borderRadius: "50%",
+                      minWidth: "20px",
+                      height: "20px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "11px",
+                      fontWeight: "700",
+                      padding: "2px 4px",
+                      border: "2px solid white",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                    }}
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </div>
+
+              {/* Favorites Icon */}
+              <div
+                style={{
+                  cursor: "pointer",
+                  padding: "8px",
+                  borderRadius: "50%",
+                  backgroundColor: "#f3f4f6",
+                  transition: "all 0.2s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "2px solid transparent",
+                }}
+                onClick={() => navigate("/favorites")}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#e5e7eb";
+                  e.currentTarget.style.borderColor = "#ef4444";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f3f4f6";
+                  e.currentTarget.style.borderColor = "transparent";
+                }}
+                title="My Favorites"
+              >
+                <span style={{ fontSize: "20px" }}>❤️</span>
+              </div>
+            </>
           )}
 
           {showBackButton && (

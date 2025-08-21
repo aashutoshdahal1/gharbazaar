@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -26,8 +26,75 @@ const PropertyDetail = () => {
   const [error, setError] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showSendMessage, setShowSendMessage] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [userReview, setUserReview] = useState(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
 
   const API_BASE_URL = url + "api";
+
+  const checkFavoriteStatus = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(`${API_BASE_URL}/favorites/check/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setIsFavorited(data.isFavorited);
+      }
+    } catch (error) {
+      console.error("Error checking favorite status:", error);
+    }
+  }, [API_BASE_URL, id]);
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/reviews/listing/${id}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setReviews(data.data.reviews);
+        setAverageRating(parseFloat(data.data.averageRating));
+        setTotalReviews(data.data.totalReviews);
+      }
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  }, [API_BASE_URL, id]);
+
+  const fetchUserReview = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(`${API_BASE_URL}/reviews/user/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        setUserReview(data.data);
+        setRating(data.data.rating);
+        setReviewText(data.data.review_text || "");
+      }
+    } catch (error) {
+      console.error("Error fetching user review:", error);
+    }
+  }, [API_BASE_URL, id]);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -38,6 +105,12 @@ const PropertyDetail = () => {
 
         if (data.success) {
           setProperty(data.data);
+          // Fetch additional data
+          await Promise.all([
+            checkFavoriteStatus(),
+            fetchReviews(),
+            fetchUserReview(),
+          ]);
         } else {
           setError("Property not found");
         }
@@ -52,7 +125,82 @@ const PropertyDetail = () => {
     if (id) {
       fetchProperty();
     }
-  }, [id, API_BASE_URL]);
+  }, [id, API_BASE_URL, checkFavoriteStatus, fetchReviews, fetchUserReview]);
+
+  const toggleFavorite = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login to save favorites");
+        return;
+      }
+
+      const method = isFavorited ? "DELETE" : "POST";
+      const url = isFavorited
+        ? `${API_BASE_URL}/favorites/${id}`
+        : `${API_BASE_URL}/favorites`;
+
+      const body = isFavorited ? null : JSON.stringify({ listing_id: id });
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsFavorited(!isFavorited);
+        alert(data.message);
+      } else {
+        alert(data.message || "Failed to update favorites");
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      alert("An error occurred while updating favorites");
+    }
+  };
+
+  const submitReview = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login to submit a review");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/reviews`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          listing_id: id,
+          rating,
+          review_text: reviewText.trim() || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(data.message);
+        setShowReviewForm(false);
+        // Refresh reviews
+        await Promise.all([fetchReviews(), fetchUserReview()]);
+      } else {
+        alert(data.message || "Failed to submit review");
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("An error occurred while submitting review");
+    }
+  };
 
   const handleSendMessage = (messageData) => {
     // Show success message and redirect to messages
@@ -532,17 +680,447 @@ const PropertyDetail = () => {
               <button
                 style={{
                   ...styles.contactButton,
+                  backgroundColor: isFavorited ? "#ef4444" : "#f8fafc",
+                  color: isFavorited ? "white" : "#374151",
+                  border: isFavorited ? "none" : "1px solid #d1d5db",
+                }}
+                onClick={toggleFavorite}
+              >
+                {isFavorited
+                  ? "❤️ Remove from Favorites"
+                  : "🤍 Save to Favorites"}
+              </button>
+
+              {/* Reviews Section */}
+              <div
+                style={{
+                  marginTop: "24px",
+                  padding: "20px",
                   backgroundColor: "#f8fafc",
-                  color: "#374151",
-                  border: "1px solid #d1d5db",
+                  borderRadius: "8px",
+                  border: "1px solid #e5e7eb",
                 }}
               >
-                ❤️ Save to Favorites
-              </button>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <h3
+                    style={{ fontSize: "18px", fontWeight: "700", margin: 0 }}
+                  >
+                    Reviews ({totalReviews})
+                  </h3>
+                  {totalReviews > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: "2px" }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span
+                            key={star}
+                            style={{
+                              color:
+                                star <= averageRating ? "#fbbf24" : "#d1d5db",
+                              fontSize: "16px",
+                            }}
+                          >
+                            ⭐
+                          </span>
+                        ))}
+                      </div>
+                      <span style={{ fontSize: "14px", color: "#6b7280" }}>
+                        {averageRating.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {localStorage.getItem("token") && !userReview && (
+                  <button
+                    style={{
+                      ...styles.contactButton,
+                      backgroundColor: "#8b5cf6",
+                      color: "white",
+                      marginBottom: "16px",
+                    }}
+                    onClick={() => {
+                      setRating(5); // Default to 5 stars for new reviews
+                      setReviewText("");
+                      setShowReviewForm(true);
+                    }}
+                  >
+                    ⭐ Write a Review
+                  </button>
+                )}
+
+                {userReview && (
+                  <div
+                    style={{
+                      backgroundColor: "white",
+                      padding: "16px",
+                      borderRadius: "8px",
+                      marginBottom: "16px",
+                      border: "2px solid #10b981",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          color: "#10b981",
+                        }}
+                      >
+                        Your Review
+                      </span>
+                      <div style={{ display: "flex", gap: "2px" }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span
+                            key={star}
+                            style={{
+                              color:
+                                star <= userReview.rating
+                                  ? "#fbbf24"
+                                  : "#d1d5db",
+                              fontSize: "14px",
+                            }}
+                          >
+                            ⭐
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    {userReview.review_text && (
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "14px",
+                          color: "#374151",
+                        }}
+                      >
+                        {userReview.review_text}
+                      </p>
+                    )}
+                    <button
+                      style={{
+                        backgroundColor: "transparent",
+                        color: "#8b5cf6",
+                        border: "1px solid #8b5cf6",
+                        padding: "6px 12px",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                        marginTop: "8px",
+                      }}
+                      onClick={() => {
+                        setRating(userReview.rating); // Set to current rating
+                        setReviewText(userReview.review_text || "");
+                        setShowReviewForm(true);
+                      }}
+                    >
+                      Edit Review
+                    </button>
+                  </div>
+                )}
+
+                {reviews.length > 0 ? (
+                  <div style={{ maxHeight: "300px", overflowY: "auto" }}>
+                    {reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        style={{
+                          backgroundColor: "white",
+                          padding: "12px",
+                          borderRadius: "6px",
+                          marginBottom: "8px",
+                          border: "1px solid #e5e7eb",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "6px",
+                          }}
+                        >
+                          <span style={{ fontSize: "14px", fontWeight: "600" }}>
+                            {review.user_name}
+                          </span>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <div style={{ display: "flex", gap: "1px" }}>
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <span
+                                  key={star}
+                                  style={{
+                                    color:
+                                      star <= review.rating
+                                        ? "#fbbf24"
+                                        : "#d1d5db",
+                                    fontSize: "12px",
+                                  }}
+                                >
+                                  ⭐
+                                </span>
+                              ))}
+                            </div>
+                            <span
+                              style={{ fontSize: "12px", color: "#6b7280" }}
+                            >
+                              {new Date(review.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        {review.review_text && (
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: "13px",
+                              color: "#374151",
+                              lineHeight: "1.4",
+                            }}
+                          >
+                            {review.review_text}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : totalReviews === 0 ? (
+                  <p style={{ fontSize: "14px", color: "#6b7280", margin: 0 }}>
+                    No reviews yet. Be the first to review this property!
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Review Form Modal */}
+      {showReviewForm && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={(e) => {
+            // Close modal if clicking on backdrop
+            if (e.target === e.currentTarget) {
+              setShowReviewForm(false);
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              maxWidth: "500px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflow: "auto",
+              boxShadow:
+                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            }}
+            onClick={(e) => {
+              // Prevent modal from closing when clicking inside
+              e.stopPropagation();
+            }}
+          >
+            <h3
+              style={{
+                fontSize: "20px",
+                fontWeight: "700",
+                marginBottom: "16px",
+              }}
+            >
+              {userReview ? "Edit Your Review" : "Write a Review"}
+            </h3>
+
+            <div style={{ marginBottom: "16px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  marginBottom: "8px",
+                }}
+              >
+                Rating
+              </label>
+              <div style={{ display: "flex", gap: "4px", marginBottom: "8px" }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log(`Setting rating to ${star}`); // Debug log
+                      setRating(star);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = "scale(1.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = "scale(1)";
+                    }}
+                    style={{
+                      backgroundColor: "transparent",
+                      border: "none",
+                      fontSize: "28px",
+                      cursor: "pointer",
+                      color: star <= rating ? "#fbbf24" : "#d1d5db",
+                      padding: "4px",
+                      borderRadius: "4px",
+                      transition: "all 0.2s ease",
+                      outline: "none",
+                    }}
+                    title={`Rate ${star} star${star > 1 ? "s" : ""}`}
+                  >
+                    ⭐
+                  </button>
+                ))}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  fontSize: "12px",
+                  color: "#6b7280",
+                }}
+              >
+                <span>Click stars to rate (1-5)</span>
+                <span
+                  style={{
+                    backgroundColor: rating > 0 ? "#10b981" : "#e5e7eb",
+                    color: rating > 0 ? "white" : "#6b7280",
+                    padding: "2px 8px",
+                    borderRadius: "12px",
+                    fontSize: "11px",
+                    fontWeight: "600",
+                  }}
+                >
+                  {rating > 0 ? `${rating}/5` : "No rating"}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: "16px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  marginBottom: "8px",
+                }}
+              >
+                Review (Optional)
+              </label>
+              <textarea
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                placeholder="Share your experience with this property..."
+                style={{
+                  width: "100%",
+                  height: "100px",
+                  padding: "12px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  resize: "vertical",
+                  fontFamily: "inherit",
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                justifyContent: "flex-end",
+              }}
+            >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowReviewForm(false);
+                  if (!userReview) {
+                    setRating(5);
+                    setReviewText("");
+                  }
+                }}
+                style={{
+                  backgroundColor: "#f8fafc",
+                  color: "#374151",
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log(`Submitting review with rating: ${rating}`); // Debug log
+                  submitReview();
+                }}
+                disabled={rating === 0}
+                style={{
+                  backgroundColor: rating > 0 ? "#8b5cf6" : "#d1d5db",
+                  color: "white",
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                  border: "none",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: rating > 0 ? "pointer" : "not-allowed",
+                  opacity: rating > 0 ? 1 : 0.5,
+                }}
+              >
+                {userReview ? "Update Review" : "Submit Review"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Send Message Modal */}
       {showSendMessage && (
