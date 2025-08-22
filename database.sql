@@ -34,6 +34,7 @@ CREATE TABLE messages (
   receiver_id INT NOT NULL,
   listing_id INT NOT NULL,
   message TEXT NOT NULL,
+  subject VARCHAR(200),
   is_read BOOLEAN DEFAULT FALSE,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
