@@ -20,7 +20,6 @@ import Admin from "./pages/admin";
 import AdminDashboard from "./pages/adminDashboard";
 import About from "./pages/about";
 import Contact from "./pages/contact";
-import Help from "./pages/Help"; // Added import for Help
 
 function App() {
   return (
@@ -114,7 +113,6 @@ function App() {
         />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/help" element={<Help />} /> {/* Added Help route */}
       </Routes>
     </BrowserRouter>
   );

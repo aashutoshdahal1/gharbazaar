@@ -1025,36 +1025,8 @@ export default function GharBazaarHomepage() {
                 </a>
               </li>
               <li style={styles.footerListItem}>
-                <a
-                  href="help"
-                  style={styles.footerLink}
-                  onMouseEnter={(e) => {
-                    e.target.style.color = "#3b82f6";
-                    e.target.style.transform = "translateX(5px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.color = "#9ca3af";
-                    e.target.style.transform = "translateX(0)";
-                  }}
-                >
-                  → Help & Support
-                </a>
               </li>
               <li style={styles.footerListItem}>
-                <a
-                  href="#"
-                  style={styles.footerLink}
-                  onMouseEnter={(e) => {
-                    e.target.style.color = "#3b82f6";
-                    e.target.style.transform = "translateX(5px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.color = "#9ca3af";
-                    e.target.style.transform = "translateX(0)";
-                  }}
-                >
-                  → Privacy Policy
-                </a>
               </li>
             </ul>
           </div>
