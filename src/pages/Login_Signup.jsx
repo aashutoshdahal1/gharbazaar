@@ -13,6 +13,7 @@ const GharBazaarAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const API_BASE_URL = url + "api";
 
@@ -356,15 +357,39 @@ const GharBazaarAuth = () => {
               </div>
               <div style={styles.inputContainer}>
                 <label style={styles.inputLabel}>
-                  <input
-                    name="password"
-                    placeholder="Password"
-                    style={styles.inputField}
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    type="password"
-                    required
-                  />
+                  <div style={{ position: "relative", width: "100%" }}>
+                    <input
+                      name="password"
+                      placeholder="Password"
+                      style={styles.inputField}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      type={showPassword ? "text" : "password"}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      style={{
+                        position: "absolute",
+                        right: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        color: "#6b7280",
+                        padding: 0,
+                      }}
+                      tabIndex={-1}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? "🙈" : "👁️"}
+                    </button>
+                  </div>
                 </label>
               </div>
               <div style={{ ...styles.inputContainer, paddingTop: 0 }}>

@@ -12,6 +12,8 @@ const EditProfile = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const API_BASE_URL = url + "api";
 
@@ -307,23 +309,48 @@ const EditProfile = () => {
                 <label htmlFor="currentPassword" style={styles.label}>
                   Current Password (Optional - only if changing password)
                 </label>
-                <input
-                  type="password"
-                  id="currentPassword"
-                  name="currentPassword"
-                  value={formData.currentPassword}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                  placeholder="Enter your current password"
-                  onFocus={(e) => {
-                    e.target.style.borderColor = styles.inputFocus.borderColor;
-                    e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = styles.input.borderColor;
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showCurrentPassword ? "text" : "password"}
+                    id="currentPassword"
+                    name="currentPassword"
+                    value={formData.currentPassword}
+                    onChange={handleInputChange}
+                    style={styles.input}
+                    placeholder="Enter your current password"
+                    onFocus={(e) => {
+                      e.target.style.borderColor =
+                        styles.inputFocus.borderColor;
+                      e.target.style.boxShadow = styles.inputFocus.boxShadow;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = styles.input.borderColor;
+                      e.target.style.boxShadow = "none";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword((s) => !s)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      color: "#6b7280",
+                      padding: 0,
+                    }}
+                    tabIndex={-1}
+                    aria-label={
+                      showCurrentPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showCurrentPassword ? "🙈" : "👁️"}
+                  </button>
+                </div>
               </div>
 
               {/* New Password */}
@@ -331,23 +358,48 @@ const EditProfile = () => {
                 <label htmlFor="password" style={styles.label}>
                   New Password (Optional - only if changing password)
                 </label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                  placeholder="Enter new password"
-                  onFocus={(e) => {
-                    e.target.style.borderColor = styles.inputFocus.borderColor;
-                    e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = styles.input.borderColor;
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    style={styles.input}
+                    placeholder="Enter new password"
+                    onFocus={(e) => {
+                      e.target.style.borderColor =
+                        styles.inputFocus.borderColor;
+                      e.target.style.boxShadow = styles.inputFocus.boxShadow;
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = styles.input.borderColor;
+                      e.target.style.boxShadow = "none";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword((s) => !s)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      color: "#6b7280",
+                      padding: 0,
+                    }}
+                    tabIndex={-1}
+                    aria-label={
+                      showNewPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showNewPassword ? "🙈" : "👁️"}
+                  </button>
+                </div>
               </div>
 
               {/* Save Changes Button */}
