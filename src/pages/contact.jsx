@@ -89,31 +89,31 @@ const Contact = () => {
   const teamMembers = [
     {
       name: "Aashutosh Dahal",
-      role: "Developer",
+      role: "FullStack Developer",
       email: "aashutosh@gmail.com",
       phone: "9866666666",
     },
     {
       name: "Arush Pradhan",
-      role: "Developer",
+      role: "Frontend Developer",
       email: "arush@gmail.com",
       phone: "9867777777",
     },
     {
       name: "Amit Saini",
-      role: "Developer",
+      role: "Frontend Developer",
       email: "amit@gmail.com",
       phone: "9868888888",
     },
     {
       name: "Gurash Subedi",
-      role: "Developer",
+      role: "Researcher",
       email: "gurash@gmail.com",
       phone: "9869999999",
     },
     {
       name: "Lukesh Raj Jyoti",
-      role: "Developer",
+      role: "Team Leader",
       email: "lukesh@gmail.com",
       phone: "9865555555",
     },

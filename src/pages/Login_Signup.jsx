@@ -63,16 +63,29 @@ const GharBazaarAuth = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Store token and user data
-        localStorage.setItem("token", data.data.token);
-        localStorage.setItem("user", JSON.stringify(data.data.user));
-
         setSuccess(data.message);
 
-        // Redirect to dashboard after successful authentication
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 1000);
+        if (isLogin) {
+          // Store token and user data for login
+          localStorage.setItem("token", data.data.token);
+          localStorage.setItem("user", JSON.stringify(data.data.user));
+
+          // Redirect to dashboard after successful login
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1000);
+        } else {
+          // For signup, just show success message and switch to login
+          setTimeout(() => {
+            setIsLogin(true);
+            setFormData({
+              name: "",
+              email: "",
+              password: "",
+            });
+            setSuccess("Account created successfully! Please log in.");
+          }, 1500);
+        }
       } else {
         setError(data.message);
       }
@@ -82,10 +95,6 @@ const GharBazaarAuth = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogoClick = () => {
-    navigate("/");
   };
 
   const styles = {
