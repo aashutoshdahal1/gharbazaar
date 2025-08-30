@@ -4,22 +4,26 @@ import Navbar from "../components/Navbar"; // ✅ Import Navbar
 const About = () => {
   // Helper function to get initials from name
   const getInitials = (name) => {
-    return name.split(' ').map(word => word[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase();
   };
 
   const teamMembers = [
-    { name: "Aashutosh Dahal", role: "Developer" },
-    { name: "Arush Pradhan", role: "Developer" },
-    { name: "Amit Saini", role: "Developer" },
-    { name: "Gurash Subedi", role: "Developer" },
-    { name: "Lukesh Raj Jyoti", role: "Developer" }
+    { name: "Aashutosh Dahal", role: "Full Stack Developer" },
+    { name: "Arush Pradhan", role: "Frontend Developer" },
+    { name: "Amit Saini", role: "Frontend Developer" },
+    { name: "Gurash Subedi", role: "Researcher" },
+    { name: "Lukesh Raj Jyoti", role: "Team Leader" },
   ];
 
   const techStack = [
     { name: "React", icon: "⚛️" },
     { name: "Express.js", icon: "🚀" },
     { name: "MySQL", icon: "🗃️" },
-    { name: "Node.js", icon: "💚" }
+    { name: "Node.js", icon: "💚" },
   ];
 
   return (
@@ -34,7 +38,14 @@ const About = () => {
         <section className="card about-story-section">
           <h2 className="card-title">Our Story</h2>
           <p className="card-subtitle">
-            GharBazaar is a revolutionary platform designed to simplify the process of buying and selling houses and land in Nepal. Created by a dedicated team of five passionate developers, we aim to bridge the gap between property seekers and sellers by providing a seamless, user-friendly experience. Our platform eliminates the traditional barriers in real estate transactions, making it easier than ever to find your dream property or sell your assets with confidence and ease.
+            GharBazaar is a revolutionary platform designed to simplify the
+            process of buying and selling houses and land in Nepal. Created by a
+            dedicated team of five passionate developers, we aim to bridge the
+            gap between property seekers and sellers by providing a seamless,
+            user-friendly experience. Our platform eliminates the traditional
+            barriers in real estate transactions, making it easier than ever to
+            find your dream property or sell your assets with confidence and
+            ease.
           </p>
         </section>
 
@@ -56,7 +67,9 @@ const About = () => {
         <section className="card about-tech-section mt-4">
           <h2 className="card-title">Technology Stack</h2>
           <p className="card-subtitle">
-            We built GharBazaar using cutting-edge technologies to ensure a robust, scalable, and efficient platform that delivers exceptional performance and user experience.
+            We built GharBazaar using cutting-edge technologies to ensure a
+            robust, scalable, and efficient platform that delivers exceptional
+            performance and user experience.
           </p>
           <div className="tech-stack-list">
             {techStack.map((tech, index) => (
@@ -70,8 +83,13 @@ const About = () => {
 
         <section className="card about-mission-section mt-4">
           <h2 className="card-title">Our Mission</h2>
-          <p className="card-subtitle">
-            To democratize real estate in Nepal by creating an accessible, transparent, and efficient platform that connects property buyers and sellers, making real estate transactions simple, secure, and stress-free for everyone.
+          <p
+            className="card-subtitle"
+            style={{ color: "white", fontSize: "16px" }}
+          >
+            Our mission is to simplify the real estate process in Nepal by
+            providing a user-friendly platform that connects buyers and sellers,
+            ensuring a seamless and efficient experience for all.
           </p>
         </section>
       </div>

@@ -1,17 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import url from "../apiurl";
+import Navbar from "../components/Navbar";
 
 const EditProfile = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
-    phoneNumber: "",
-    email: "",
     currentPassword: "",
     password: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const API_BASE_URL = url + "api";
+
+  // Load current user data
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
+    if (!token || !userData) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const parsedUser = JSON.parse(userData);
+      setFormData((prev) => ({
+        ...prev,
+        fullName: parsedUser.name || "",
+      }));
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,26 +54,91 @@ const EditProfile = () => {
     setIsLoading(true);
 
     try {
-      // Validate password fields if user wants to change password
-      if (formData.password && !formData.currentPassword) {
-        alert(
-          "Please enter your current password to change to a new password."
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in again");
+        navigate("/login");
+        return;
+      }
+
+      // Validate name
+      if (!formData.fullName.trim()) {
+        alert("Name is required");
+        setIsLoading(false);
+        return;
+      }
+
+      // If password change is requested, validate password fields
+      if (formData.password || formData.currentPassword) {
+        if (!formData.currentPassword) {
+          alert(
+            "Please enter your current password to change to a new password."
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        if (!formData.password) {
+          alert("Please enter a new password.");
+          setIsLoading(false);
+          return;
+        }
+
+        if (formData.password.length < 6) {
+          alert("New password must be at least 6 characters long.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Update profile name
+      const profileResponse = await fetch(`${API_BASE_URL}/auth/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: formData.fullName.trim(),
+        }),
+      });
+
+      const profileData = await profileResponse.json();
+
+      if (!profileData.success) {
+        alert(profileData.message || "Failed to update profile");
+        setIsLoading(false);
+        return;
+      }
+
+      // Update localStorage with new user data
+      localStorage.setItem("user", JSON.stringify(profileData.data.user));
+
+      // If password change is requested, update password
+      if (formData.password && formData.currentPassword) {
+        const passwordResponse = await fetch(
+          `${API_BASE_URL}/auth/change-password`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              currentPassword: formData.currentPassword,
+              newPassword: formData.password,
+            }),
+          }
         );
-        setIsLoading(false);
-        return;
+
+        const passwordData = await passwordResponse.json();
+
+        if (!passwordData.success) {
+          alert(passwordData.message || "Failed to update password");
+          setIsLoading(false);
+          return;
+        }
       }
-
-      if (formData.currentPassword && !formData.password) {
-        alert("Please enter a new password.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Add your API call here to save the profile changes
-      console.log("Saving profile changes:", formData);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       alert("Profile updated successfully!");
       navigate("/profile");
@@ -176,223 +265,154 @@ const EditProfile = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.wrapper}>
-        {/* Back Button */}
-        <button
-          onClick={handleBackClick}
-          style={styles.backButton}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor =
-              styles.backButtonHover.backgroundColor;
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = styles.backButton.backgroundColor;
-          }}
-        >
-          <svg
-            style={styles.icon}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back
-        </button>
+    <>
+      <Navbar
+        showBackButton={true}
+        backButtonText="← Back to Profile"
+        backButtonAction={handleBackClick}
+      />
+      <div style={styles.container}>
+        <div style={styles.wrapper}>
+          {/* Main Content */}
+          <div style={styles.mainCard}>
+            <h1 style={styles.title}>Edit Profile</h1>
 
-        {/* Main Content */}
-        <div style={styles.mainCard}>
-          <h1 style={styles.title}>Edit Profile</h1>
+            <div style={styles.formContainer}>
+              {/* Full Name */}
+              <div style={styles.fieldContainer}>
+                <label htmlFor="fullName" style={styles.label}>
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  placeholder="Enter your full name"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = styles.inputFocus.borderColor;
+                    e.target.style.boxShadow = styles.inputFocus.boxShadow;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = styles.input.borderColor;
+                    e.target.style.boxShadow = "none";
+                  }}
+                />
+              </div>
 
-          <div style={styles.formContainer}>
-            {/* Full Name */}
-            <div style={styles.fieldContainer}>
-              <label htmlFor="fullName" style={styles.label}>
-                Full Name
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                style={styles.input}
-                placeholder="Enter your full name"
-                onFocus={(e) => {
-                  e.target.style.borderColor = styles.inputFocus.borderColor;
-                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = styles.input.borderColor;
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-            </div>
+              {/* Current Password */}
+              <div style={styles.fieldContainer}>
+                <label htmlFor="currentPassword" style={styles.label}>
+                  Current Password (Optional - only if changing password)
+                </label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  placeholder="Enter your current password"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = styles.inputFocus.borderColor;
+                    e.target.style.boxShadow = styles.inputFocus.boxShadow;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = styles.input.borderColor;
+                    e.target.style.boxShadow = "none";
+                  }}
+                />
+              </div>
 
-            {/* Phone Number */}
-            <div style={styles.fieldContainer}>
-              <label htmlFor="phoneNumber" style={styles.label}>
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                style={styles.input}
-                placeholder="Enter your phone number"
-                onFocus={(e) => {
-                  e.target.style.borderColor = styles.inputFocus.borderColor;
-                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = styles.input.borderColor;
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-            </div>
+              {/* New Password */}
+              <div style={styles.fieldContainer}>
+                <label htmlFor="password" style={styles.label}>
+                  New Password (Optional - only if changing password)
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  placeholder="Enter new password"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = styles.inputFocus.borderColor;
+                    e.target.style.boxShadow = styles.inputFocus.boxShadow;
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = styles.input.borderColor;
+                    e.target.style.boxShadow = "none";
+                  }}
+                />
+              </div>
 
-            {/* Email */}
-            <div style={styles.fieldContainer}>
-              <label htmlFor="email" style={styles.label}>
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                style={styles.input}
-                placeholder="Enter your email address"
-                onFocus={(e) => {
-                  e.target.style.borderColor = styles.inputFocus.borderColor;
-                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = styles.input.borderColor;
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-            </div>
-
-            {/* Current Password */}
-            <div style={styles.fieldContainer}>
-              <label htmlFor="currentPassword" style={styles.label}>
-                Current Password
-              </label>
-              <input
-                type="password"
-                id="currentPassword"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleInputChange}
-                style={styles.input}
-                placeholder="Enter your current password"
-                onFocus={(e) => {
-                  e.target.style.borderColor = styles.inputFocus.borderColor;
-                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = styles.input.borderColor;
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-            </div>
-
-            {/* Password */}
-            <div style={styles.fieldContainer}>
-              <label htmlFor="password" style={styles.label}>
-                New Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                style={styles.input}
-                placeholder="Enter new password"
-                onFocus={(e) => {
-                  e.target.style.borderColor = styles.inputFocus.borderColor;
-                  e.target.style.boxShadow = styles.inputFocus.boxShadow;
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = styles.input.borderColor;
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-            </div>
-
-            {/* Save Changes Button */}
-            <div style={styles.buttonContainer}>
-              <button
-                type="button"
-                onClick={handleSaveChanges}
-                disabled={isLoading}
-                style={{
-                  ...styles.saveButton,
-                  ...(isLoading ? styles.saveButtonDisabled : {}),
-                }}
-                onMouseEnter={(e) => {
-                  if (!isLoading) {
-                    e.target.style.backgroundColor =
-                      styles.saveButtonHover.backgroundColor;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isLoading) {
-                    e.target.style.backgroundColor =
-                      styles.saveButton.backgroundColor;
-                  }
-                }}
-              >
-                {isLoading ? (
-                  <>
-                    <div style={styles.spinner}></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      style={styles.icon}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
-                      />
-                    </svg>
-                    Save Changes
-                  </>
-                )}
-              </button>
+              {/* Save Changes Button */}
+              <div style={styles.buttonContainer}>
+                <button
+                  type="button"
+                  onClick={handleSaveChanges}
+                  disabled={isLoading}
+                  style={{
+                    ...styles.saveButton,
+                    ...(isLoading ? styles.saveButtonDisabled : {}),
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.target.style.backgroundColor =
+                        styles.saveButtonHover.backgroundColor;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.target.style.backgroundColor =
+                        styles.saveButton.backgroundColor;
+                    }
+                  }}
+                >
+                  {isLoading ? (
+                    <>
+                      <div style={styles.spinner}></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        style={styles.icon}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* CSS Animation for spinner */}
-      <style>
-        {`
+        {/* CSS Animation for spinner */}
+        <style>
+          {`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
         `}
-      </style>
-    </div>
+        </style>
+      </div>
+    </>
   );
 };
 

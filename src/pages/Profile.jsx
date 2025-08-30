@@ -51,7 +51,7 @@ const Profile = () => {
 
           <button
             className="btn btn-primary mt-3"
-            onClick={() => navigate("/profile/edit")}
+            onClick={() => navigate("/edit-profile")}
           >
             Edit Profile
           </button>

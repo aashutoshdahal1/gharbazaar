@@ -319,4 +319,54 @@ router.put("/change-password", authenticateToken, async (req, res) => {
   }
 });
 
+// Update profile route (protected)
+router.put("/profile", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    // Validate input
+    if (!name || name.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Name is required",
+      });
+    }
+
+    // Update user name in database
+    await pool.execute("UPDATE users SET name = ? WHERE id = ?", [
+      name.trim(),
+      req.user.id,
+    ]);
+
+    // Get updated user info
+    const [users] = await pool.execute(
+      "SELECT id, name, email, role FROM users WHERE id = ?",
+      [req.user.id]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const updatedUser = users[0];
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+});
+
 module.exports = router;
