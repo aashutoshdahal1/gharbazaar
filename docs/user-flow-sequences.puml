@@ -1,0 +1,49 @@
+@startuml
+title GharBazaar - Simple User Flow
+
+actor User
+participant Frontend
+participant Backend
+participant Database
+
+== Login ==
+User -> Frontend : login
+Frontend -> Backend : credentials
+Backend -> Database : verify user
+Database -> Backend : user data
+Backend -> Frontend : JWT token
+Frontend -> User : logged in
+
+== Browse Properties ==
+User -> Frontend : visit homepage
+Frontend -> Backend : get properties
+Backend -> Database : select listings
+Database -> Backend : property list
+Backend -> Frontend : properties
+Frontend -> User : show properties
+
+== View Property Detail ==
+User -> Frontend : click property
+Frontend -> Backend : get property/:id
+Backend -> Database : select listing
+Database -> Backend : property details
+Backend -> Frontend : details
+Frontend -> User : show detail page
+
+== Add to Favorites ==
+User -> Frontend : click favorite
+Frontend -> Backend : add favorite
+Backend -> Database : insert favorite
+Database -> Backend : saved
+Backend -> Frontend : success
+Frontend -> User : heart filled
+
+== Write Review ==
+User -> Frontend : submit review
+Frontend -> Backend : save review
+Backend -> Database : insert review
+Database -> Backend : saved
+Backend -> Frontend : success
+Frontend -> User : review displayed
+
+@enduml

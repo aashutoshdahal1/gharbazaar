@@ -104,7 +104,6 @@ const Navbar = ({
         >
           <LogoDisplay
             style={{
-              fontSize: "24px",
               fontWeight: "bold",
               color: "#1e40af",
               cursor: "pointer",
@@ -112,7 +111,9 @@ const Navbar = ({
               alignItems: "center",
               gap: "8px",
             }}
-            size="medium"
+            size="large"
+            imageSize="56px"
+            textSize="14px"
             onClick={() => navigate("/")}
           />
           {showHomeAndProperties && (

@@ -133,6 +133,9 @@ export const LogoDisplay = ({
   size = "medium",
   showText = true,
   onClick = null,
+  // Optional overrides to control text and image sizes independently
+  textSize = null,
+  imageSize = null,
 }) => {
   const { logo } = useLogo();
 
@@ -162,7 +165,7 @@ export const LogoDisplay = ({
           src={logo.image}
           alt="GharBazaar Logo"
           style={{
-            height: currentSize.imageSize,
+            height: imageSize || currentSize.imageSize,
             width: "auto",
             maxWidth: "200px",
             objectFit: "contain",
@@ -171,7 +174,7 @@ export const LogoDisplay = ({
         {showText && (
           <span
             style={{
-              fontSize: currentSize.fontSize,
+              fontSize: textSize || currentSize.fontSize,
               fontWeight: "bold",
               color: "#1e40af",
             }}
@@ -188,7 +191,7 @@ export const LogoDisplay = ({
     <div style={containerStyle} onClick={onClick}>
       <span
         style={{
-          fontSize: currentSize.fontSize,
+          fontSize: textSize || currentSize.fontSize,
           fontWeight: "bold",
           color: "#1e40af",
         }}

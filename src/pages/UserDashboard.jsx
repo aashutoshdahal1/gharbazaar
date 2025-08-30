@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import url from "../apiurl"; // Import the API base URL
 import Navbar from "../components/Navbar";
+import { LogoDisplay } from "../utils/logoManager.jsx";
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -84,6 +85,24 @@ const UserDashboard = () => {
         setStats((prevStats) => ({
           ...prevStats,
           activeListings: listingsData.data.length,
+        }));
+      }
+
+      // Fetch user's favorites count
+      const favoritesResponse = await fetch(`${API_BASE_URL}/favorites`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const favoritesData = await favoritesResponse.json();
+
+      if (favoritesData.success) {
+        setStats((prevStats) => ({
+          ...prevStats,
+          savedProperties: favoritesData.data.length,
         }));
       }
     } catch (error) {
@@ -180,20 +199,13 @@ const UserDashboard = () => {
     logoContainer: {
       display: "flex",
       alignItems: "center",
-      gap: "16px",
-      color: "#121516",
-    },
-    logo: {
-      width: "16px",
-      height: "16px",
-    },
-    title: {
-      color: "#121516",
-      fontSize: "18px",
-      fontWeight: "bold",
-      lineHeight: "1.25",
-      letterSpacing: "-0.015em",
+      gap: "0.75rem",
+      fontSize: "1.75rem",
+      fontWeight: "700",
+      color: "#1e40af",
       cursor: "pointer",
+      textDecoration: "none",
+      transition: "transform 0.2s ease",
     },
     navLinks: {
       display: "flex",
@@ -347,12 +359,17 @@ const UserDashboard = () => {
     <div style={styles.designRoot}>
       <div style={styles.layoutContainer}>
         <header style={styles.header}>
-          <div style={styles.logoContainer}>
-            <div style={styles.logo}>🏠</div>
-            <h2 style={styles.title} onClick={handleHomeClick}>
-              GharBazaar
-            </h2>
-          </div>
+          <LogoDisplay
+            style={styles.logoContainer}
+            size="large"
+            imageSize="56px"
+            textSize="14px"
+            onClick={handleHomeClick}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.02)")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          />
           <div style={styles.navLinks}>
             <div style={styles.navLinkContainer}>
               <span
@@ -433,62 +450,61 @@ const UserDashboard = () => {
             </p>
           </div>
 
-<div style={styles.statsContainer}>
-  <div
-    style={styles.statCard}
-    onClick={handleMyListingsClick}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "translateY(-2px)";
-      e.currentTarget.style.boxShadow =
-        "0 4px 12px rgba(0, 0, 0, 0.15)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow =
-        "0 1px 3px rgba(0, 0, 0, 0.1)";
-    }}
-  >
-    <div style={styles.statNumber}>{stats.activeListings}</div>
-    <div style={styles.statLabel}>Active Listings</div>
-  </div>
+          <div style={styles.statsContainer}>
+            <div
+              style={styles.statCard}
+              onClick={handleMyListingsClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(0, 0, 0, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 1px 3px rgba(0, 0, 0, 0.1)";
+              }}
+            >
+              <div style={styles.statNumber}>{stats.activeListings}</div>
+              <div style={styles.statLabel}>Active Listings</div>
+            </div>
 
-  <div
-    style={styles.statCard}
-    onClick={handleFavoritesClick}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "translateY(-2px)";
-      e.currentTarget.style.boxShadow =
-        "0 4px 12px rgba(0, 0, 0, 0.15)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow =
-        "0 1px 3px rgba(0, 0, 0, 0.1)";
-    }}
-  >
-    <div style={styles.statNumber}>{stats.savedProperties}</div>
-    <div style={styles.statLabel}>Saved Properties</div>
-  </div>
+            <div
+              style={styles.statCard}
+              onClick={handleFavoritesClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(0, 0, 0, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 1px 3px rgba(0, 0, 0, 0.1)";
+              }}
+            >
+              <div style={styles.statNumber}>{stats.savedProperties}</div>
+              <div style={styles.statLabel}>Saved Properties</div>
+            </div>
 
-  <div
-    style={styles.statCard}
-    onClick={handleViewMessagesClick}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "translateY(-2px)";
-      e.currentTarget.style.boxShadow =
-        "0 4px 12px rgba(0, 0, 0, 0.15)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow =
-        "0 1px 3px rgba(0, 0, 0, 0.1)";
-    }}
-  >
-    <div style={styles.statNumber}>{stats.messages}</div>
-    <div style={styles.statLabel}>Messages</div>
-  </div>
-</div>
-
+            <div
+              style={styles.statCard}
+              onClick={handleViewMessagesClick}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(0, 0, 0, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 1px 3px rgba(0, 0, 0, 0.1)";
+              }}
+            >
+              <div style={styles.statNumber}>{stats.messages}</div>
+              <div style={styles.statLabel}>Messages</div>
+            </div>
+          </div>
 
           <div style={styles.quickActions}>
             <h3 style={styles.sectionTitle}>Quick Actions</h3>

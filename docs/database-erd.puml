@@ -1,0 +1,177 @@
+@startuml
+!define primary_key(x) <b><color:#b8861b><&key></color> x</b>
+!define foreign_key(x) <color:#aaaaaa><&key></color> x
+!define column(x) <color:#efefef><&media-record></color> x
+!define table(x) entity x << (T, white) >>
+
+' Database ERD for GharBazaar
+title GharBazaar Database Schema
+
+' Users table
+table(users) {
+  primary_key(id): INT
+  --
+  column(name): VARCHAR(100)
+  column(email): VARCHAR(100) UNIQUE
+  column(password): VARCHAR(255)
+  column(role): ENUM('user','admin')
+  column(created_at): DATETIME
+}
+
+' Listings table
+table(listings) {
+  primary_key(id): INT
+  --
+  foreign_key(user_id): INT
+  column(title): VARCHAR(255)
+  column(description): TEXT
+  column(property_type): ENUM('land','room','flat','house')
+  column(purpose): ENUM('rent','buy','sell')
+  column(price): DECIMAL(12,2)
+  column(location): VARCHAR(255)
+  column(area): VARCHAR(100)
+  column(phone_number): VARCHAR(20)
+  column(images): TEXT
+  column(latitude): DECIMAL(10,8)
+  column(longitude): DECIMAL(11,8)
+  column(created_at): DATETIME
+}
+
+' Messages table
+table(messages) {
+  primary_key(id): INT
+  --
+  foreign_key(sender_id): INT
+  foreign_key(receiver_id): INT
+  foreign_key(listing_id): INT
+  column(message): TEXT
+  column(subject): VARCHAR(200)
+  column(is_read): BOOLEAN
+  column(created_at): DATETIME
+}
+
+' Comments table
+table(comments) {
+  primary_key(id): INT
+  --
+  foreign_key(listing_id): INT
+  foreign_key(user_id): INT
+  column(comment): TEXT
+  column(created_at): DATETIME
+}
+
+' Ratings table
+table(ratings) {
+  primary_key(id): INT
+  --
+  foreign_key(listing_id): INT
+  foreign_key(user_id): INT
+  column(rating): TINYINT(1-5)
+  column(created_at): DATETIME
+  --
+  UNIQUE(listing_id, user_id)
+}
+
+' Reports table
+table(reports) {
+  primary_key(id): INT
+  --
+  foreign_key(reporter_id): INT (NULLABLE)
+  foreign_key(reported_user_id): INT (NULLABLE)
+  foreign_key(reported_listing_id): INT (NULLABLE)
+  column(reason): TEXT
+  column(status): ENUM('pending','reviewed','dismissed')
+  column(created_at): DATETIME
+}
+
+' Contact Submissions table
+table(contact_submissions) {
+  primary_key(id): INT
+  --
+  column(name): VARCHAR(100)
+  column(email): VARCHAR(100)
+  column(subject): VARCHAR(200)
+  column(message): TEXT
+  column(status): ENUM('new','read','replied','closed')
+  column(created_at): DATETIME
+  column(updated_at): DATETIME
+}
+
+' Favorites table
+table(favorites) {
+  primary_key(id): INT
+  --
+  foreign_key(user_id): INT
+  foreign_key(listing_id): INT
+  column(created_at): DATETIME
+  --
+  UNIQUE(user_id, listing_id)
+}
+
+' Reviews table
+table(reviews) {
+  primary_key(id): INT
+  --
+  foreign_key(listing_id): INT
+  foreign_key(user_id): INT
+  column(rating): TINYINT(1-5)
+  column(review_text): TEXT
+  column(created_at): DATETIME
+  column(updated_at): DATETIME
+  --
+  UNIQUE(listing_id, user_id)
+}
+
+' Search Logs table
+table(search_logs) {
+  primary_key(id): INT
+  --
+  foreign_key(user_id): INT (NULLABLE)
+  column(query): TEXT
+  column(searched_at): DATETIME
+}
+
+' Relationships
+users ||--o{ listings : "creates"
+users ||--o{ messages : "sends"
+users ||--o{ messages : "receives"
+listings ||--o{ messages : "about"
+
+users ||--o{ comments : "writes"
+listings ||--o{ comments : "has"
+
+users ||--o{ ratings : "gives"
+listings ||--o{ ratings : "receives"
+
+users ||--o{ favorites : "saves"
+listings ||--o{ favorites : "favorited_by"
+
+users ||--o{ reviews : "writes"
+listings ||--o{ reviews : "has"
+
+users ||--o{ reports : "reports"
+users ||--o{ reports : "reported_as_user"
+listings ||--o{ reports : "reported_as_listing"
+
+users ||--o{ search_logs : "performs"
+
+' Styling
+skinparam entity {
+  BackgroundColor lightblue
+  BorderColor black
+  FontSize 11
+}
+
+skinparam class {
+  BackgroundColor lightgreen
+  BorderColor darkgreen
+  ArrowColor darkblue
+}
+
+note top of users : Core user management\nwith role-based access
+note top of listings : Property listings with\ngeolocation support
+note top of favorites : Many-to-many relationship\nbetween users and listings
+note top of reviews : User reviews with ratings\n(1-5 stars)
+note bottom of contact_submissions : Standalone contact form\nsubmissions (no FK to users)
+
+@enduml

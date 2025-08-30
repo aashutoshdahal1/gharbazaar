@@ -559,7 +559,9 @@ export default function GharBazaarHomepage() {
           {/* Logo */}
           <LogoDisplay
             style={styles.logo}
-            size="medium"
+            size="large"
+            imageSize="56px"
+            textSize="14px"
             onClick={handleLogoClick}
             onMouseEnter={(e) =>
               (e.currentTarget.style.transform = "scale(1.02)")
@@ -594,7 +596,7 @@ export default function GharBazaarHomepage() {
                   style={styles.navLink}
                   onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
                   onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
-                  onClick={() => window.location.href = "/about"}
+                  onClick={() => (window.location.href = "/about")}
                 >
                   About
                 </span>
@@ -604,12 +606,11 @@ export default function GharBazaarHomepage() {
                   style={styles.navLink}
                   onMouseEnter={(e) => (e.target.style.color = "#1e40af")}
                   onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
-                  onClick={() => window.location.href = "/contact"}
+                  onClick={() => (window.location.href = "/contact")}
                 >
                   Contact
                 </span>
               </li>
-
             </ul>
           </nav>
 
@@ -1024,10 +1025,8 @@ export default function GharBazaarHomepage() {
                   → Contact Us
                 </a>
               </li>
-              <li style={styles.footerListItem}>
-              </li>
-              <li style={styles.footerListItem}>
-              </li>
+              <li style={styles.footerListItem}></li>
+              <li style={styles.footerListItem}></li>
             </ul>
           </div>
           <div style={styles.footerSection}>

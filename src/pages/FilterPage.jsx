@@ -1377,9 +1377,7 @@ const PropertyListing = () => {
                             "rgba(255, 255, 255, 0.9)";
                           e.target.style.transform = "scale(1)";
                         }}
-                      >
-                        <span>♡</span>
-                      </button>
+                      ></button>
                     </div>
                     <div style={styles.cardContent}>
                       <h3 style={styles.cardTitle}>{property.title}</h3>
