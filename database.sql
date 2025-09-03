@@ -116,14 +116,6 @@ CREATE TABLE reviews (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- OPTIONAL: SEARCH LOGS
-CREATE TABLE search_logs (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT,
-  query TEXT NOT NULL,
-  searched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-);
 
 -- Insert default admin user
 -- Password is 'admin123' (hashed with bcrypt)
